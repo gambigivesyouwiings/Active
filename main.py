@@ -15,11 +15,21 @@ from sqlalchemy.exc import IntegrityError, ProgrammingError
 
 map_api = os.getenv("map_api")
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///content.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///content.db"
+
+
+user, password = 'mushroommotors', 'kirubinjenga'
+host = 'mushroommotors.mysql.pythonanywhere-services.com'
+db_name = 'mushroommotors$again'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{user}:{password}@{host}/{db_name}"
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 280}
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy()
-db.init_app(app)
+
 Bootstrap(app=app)
+db.init_app(app)
 
 
 class Catalogue(db.Model):
@@ -66,8 +76,16 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+def delete_app():
+    with app.app_context():
+        db.drop_all()
 
-# save_post(title="Honda Vezel Hybrid", model_year=2017, engine_rating=1500, transmission="automatic", fuel="hybrid", price=2800000, mileage=85000, extras="Anti-Collission Assist, Keyless Entry, Alloy Rims, Push to start, Bumper Fog lights.", vehicle_type="saloon", drive_type="AWD", brand="honda", folder="static/assets/cars/honda", img_url="['back.jpeg','front.jpeg', 'interior.jpeg']")
+# delete_app()
+# create_app()
+# save_post(title="lexus  D4-D LEXUS 450D", model_year=2019, engine_rating=4500, transmission="automatic", fuel="diesel", price=18500000, mileage=20000, extras="5 Seats, beige interior leather, Electric seats, fog lights", vehicle_type="SUV", drive_type="4WD", brand="lexus", folder="/static/assets/cars/lexus", img_url="['back.jpeg','front.jpeg','interior.jpeg']")
+# save_post(title="Nissan XTRAIL", model_year=2017, engine_rating=3500, transmission="automatic", fuel="petrol", price=2500000, mileage=50000, extras="Heater Seats with leather Power boot 360° camera. Original Nissan rims. ", vehicle_type="SUV", drive_type="AWD", brand="nissan", folder="/static/assets/cars/nissanxtrail", img_url="['back.jpeg','front.jpeg','interior.jpeg']")
+# save_post(title="Honda Vezel Hybrid", model_year=2017, engine_rating=1500, transmission="automatic", fuel="hybrid", price=2800000, mileage=85000, extras="Anti-Collission Assist, Keyless Entry, Alloy Rims, Push to start, Bumper Fog lights.", vehicle_type="saloon", drive_type="AWD", brand="honda", folder="/static/assets/cars/honda", img_url="['back.jpeg','front.jpeg','interior.jpeg']")
+
 # app.config['GOOGLEMAPS_KEY'] = os.getenv("google_key")
 # drive = GoogleDriveApi()
 # f = drive.download_file(real_file_id="1-e_w9p52otiIp5S8onSNB3tnPruDPQFC", path="static")
