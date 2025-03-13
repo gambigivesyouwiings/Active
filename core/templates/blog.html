@@ -96,6 +96,61 @@
       </div>
     </div><!-- End Page Title -->
 
+    <!-- templates/search_widget.html -->
+<div class="search-widget">
+    <form id="searchForm" onsubmit="return false;">
+        <div class="filter-section">
+            <input type="text" id="keyword" name="keyword" placeholder="Enter keyword" class="search-input">
+
+            <div class="filter-group">
+                <label>Location</label>
+                <select name="location" id="location" class="filter-select">
+                    <option value="">All Locations</option>
+                    {% for location in locations %}
+                    <option value="{{ location }}">{{ location }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Fuel Type</label>
+                <div class="checkbox-group">
+                    {% for fuel in fuel_types %}
+                    <label>
+                        <input type="checkbox" name="fuel_type" value="{{ fuel }}">
+                        {{ fuel }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Condition</label>
+                <div class="toggle-buttons">
+                    <button type="button" class="toggle-btn active" data-value="all">All (294)</button>
+                    <button type="button" class="toggle-btn" data-value="new">New (261)</button>
+                    <button type="button" class="toggle-btn" data-value="used">Used (33)</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Features</label>
+                <select name="features" id="features" class="filter-select" multiple>
+                    {% for feature in features %}
+                    <option value="{{ feature }}">{{ feature }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="button" onclick="clearFilters()" class="clear-btn">Clear all</button>
+                <button type="button" onclick="performSearch()" class="search-btn">Search</button>
+            </div>
+        </div>
+    </form>
+    <div id="resultsContainer"></div>
+</div>
+
     <!-- Blog Posts 2 Section -->
     <section id="blog-posts-2" class="blog-posts-2 section">
 

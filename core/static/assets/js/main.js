@@ -176,6 +176,39 @@
     });
   }
 
+  function performSearch() {
+    const formData = {
+        keyword: document.getElementById('keyword').value,
+        location: document.getElementById('location').value,
+        fuel_type: Array.from(document.querySelectorAll('input[name="fuel_type"]:checked')).map(cb => cb.value),
+        condition: document.querySelector('.toggle-btn.active').dataset.value,
+        features: Array.from(document.getElementById('features').selectedOptions).map(opt => opt.value)
+    };
+
+    fetch('/search', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => updateResults(data))
+    .catch(error => console.error('Error:', error));
+}
+
+function clearFilters() {
+    document.getElementById('searchForm').reset();
+    document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.toggle-btn[data-value="all"]').classList.add('active');
+    performSearch();
+}
+
+function updateResults(data) {
+    const container = document.getElementById('resultsContainer');
+    // Update results display logic here
+}
+
   window.addEventListener("load", initSwiperTabs);
 
   /**

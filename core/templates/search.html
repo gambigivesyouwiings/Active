@@ -1,0 +1,9 @@
+<div class="p-2 bd-highlight" id="results">
+<i class="bi bi-x" onclick="closeSearch()"></i>
+{% for result in results %}
+<div class="row">
+    <div class="col-4"><a href="{{ url_for('blog_details', post_id=result.id) }}"><img src='{{result.folder_name + "/" + result.img_url.strip("[]").split(",")[1].strip("\'")}}'></a></div>
+    <div class="col-8"><a href="{{ url_for('blog_details', post_id=result.id) }}"><p><b>{{result.title}}</b></p><p>Price: Ksh {{result.price}}</p></a></div>
+</div>
+{% endfor %}
+</div>
