@@ -1,10 +1,11 @@
 from core import db
+from flask_login import UserMixin
 
 
 class Catalogue(db.Model):
     __tablename__ = "car_catalogue"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(250), nullable=False)
+    title = db.Column(db.String(250), nullable=True)
     brand = db.Column(db.String(250), nullable=True)
     vehicle_type = db.Column(db.String(250), nullable=True)
     model_year = db.Column(db.Integer, nullable=True)
@@ -18,3 +19,19 @@ class Catalogue(db.Model):
 
     folder_name = db.Column(db.String(250), nullable=True)
     img_url = db.Column(db.String(250), nullable=True)
+    availability = db.Column(db.String(250), nullable=True)
+    reserved = db.Column(db.Boolean, default=False, nullable=True)
+
+
+class Users(UserMixin, db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(250), unique=True, nullable=False)
+    name = db.Column(db.String(250), unique=False, nullable=False)
+    password = db.Column(db.String(250), unique=False, nullable=False)
+    created_on = db.Column(db.DateTime, nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    is_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
+    edits = db.Column(db.Integer, nullable=True)
+    posts_made = db.Column(db.Integer, nullable=True)

@@ -86,65 +86,98 @@
     <!-- Page Title -->
     <div class="page-title light-background">
       <div class="container">
+                      <i class="bi bi-filter d-flex align-items-center justify-content-center light-background" id="filterButton" onclick="toggleFilterForm()">Show filter</i>
+
         <h1>Vehicles</h1>
-        <nav class="breadcrumbs">
+          <nav class="breadcrumbs">
           <ol>
             <li><a href="{{url_for('home')}}">Home</a></li>
-            <li class="current">Vehicle Catalogue MVP</li>
+            <li class="current">Vehicle Catalogue</li>
           </ol>
         </nav>
       </div>
     </div><!-- End Page Title -->
 
     <!-- templates/search_widget.html -->
-<div class="search-widget">
+<div class="search-widget" id="target">
     <form id="searchForm" onsubmit="return false;">
         <div class="filter-section">
             <input type="text" id="keyword" name="keyword" placeholder="Enter keyword" class="search-input">
-
-            <div class="filter-group">
-                <label>Location</label>
-                <select name="location" id="location" class="filter-select">
-                    <option value="">All Locations</option>
-                    {% for location in locations %}
-                    <option value="{{ location }}">{{ location }}</option>
+            <div class="row">
+            <div class="col-2 filter-group">
+                <label>Brand</label>
+                <select name="brand" id="brand" class="filter-select" hx-post="/options" hx-trigger="change" hx-target="#model">
+                    <option value="all">All brands</option>
+                    {% for brand in brands %}
+                    <option value="{{ brand }}">{{ brand }}</option>
                     {% endfor %}
+                </select>
+                <label>Model</label>
+                <select name="model" id="model" class="filter-select">
+                    <option value="all">All Models</option>
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label>Fuel Type</label>
+            <div class="col-2 filter-group">
+                <label>Filter by Budget</label>
                 <div class="checkbox-group">
-                    {% for fuel in fuel_types %}
                     <label>
-                        <input type="checkbox" name="fuel_type" value="{{ fuel }}">
-                        {{ fuel }}
+                        <input type="checkbox" name="price" value="0-500K">
+                        0-500K
                     </label>
-                    {% endfor %}
+                    <label>
+                        <input type="checkbox" name="price" value="500K-1M">
+                        500K-1M
+                    </label>
+                     <label>
+                        <input type="checkbox" name="price" value="1M-1.5M">
+                        1M-1.5M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="1.5M-2M">
+                        1.5M-2M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="2M-3M">
+                        2M-3M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="3M-5M">
+                        3M-5M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="5M-10M">
+                        5M-10M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="Above 10M">
+                        Above 10M
+                    </label>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <label>Condition</label>
-                <div class="toggle-buttons">
+            <div class="col-2 filter-group">
+                <label>Availability</label>
+                <div class="toggle-buttons" id="filter-actions" onclick="chooseFilter(event)">
                     <button type="button" class="toggle-btn active" data-value="all">All (294)</button>
-                    <button type="button" class="toggle-btn" data-value="new">New (261)</button>
-                    <button type="button" class="toggle-btn" data-value="used">Used (33)</button>
+                    <button type="button" class="toggle-btn" data-value="local">Available in Kenya</button>
+                    <button type="button" class="toggle-btn" data-value="import">Direct Import/International stock</button>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <label>Features</label>
-                <select name="features" id="features" class="filter-select" multiple>
-                    {% for feature in features %}
-                    <option value="{{ feature }}">{{ feature }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+<!--            <div class="col-2 filter-group">-->
+<!--                <label>Features</label>-->
+<!--                <select name="features" id="features" class="filter-select" multiple>-->
+<!--                    {% for feature in features %}-->
+<!--                    <option value="{{ feature }}">{{ feature }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
 
-            <div class="filter-actions">
-                <button type="button" onclick="clearFilters()" class="clear-btn">Clear all</button>
-                <button type="button" onclick="performSearch()" class="search-btn">Search</button>
+            <div class="col-2 filter-actions">
+                <button type="button" onclick="clearFilters()" class="btn btn-primary clear-button">Clear all</button>
+                <button type="button" onclick="performSearch()" class="btn btn-primary search-button">Search</button>
+            </div>
             </div>
         </div>
     </form>
@@ -154,7 +187,7 @@
     <!-- Blog Posts 2 Section -->
     <section id="blog-posts-2" class="blog-posts-2 section">
 
-      <div class="container">
+      <div class="container" id="results-container">
 
         <div class="row gy-5">
 
@@ -164,7 +197,7 @@
             <article>
 
               <div class="post-img">
-                <img src='{{page.folder_name + "/" + page.img_url.strip("[]").split(",")[1].strip("\'")}}' alt="" class="img-fluid">
+                <img src='{{page.folder_name + "/" + page.img_url.strip("[]").split(",")[1].strip().strip("\'")}}' alt="" class="img-fluid">
               </div>
 
               <div class="meta-top">
@@ -192,34 +225,61 @@
 
       <div class="container">
         <div class="d-flex justify-content-center">
-          {% macro render_pagination(pages, vehicles) %}
-  <div class="page-items">
-    {{ pages.first }} - {{ pages.last }} of {{ pages.total }}
-  </div>
-  <div class=pagination>
-    {% for page in pages.iter_pages() %}
-      {% if page %}
-        {% if page != pages.page %}
-          <a href="{{ url_for('vehicles', page=page) }}">{{ page }}</a>
+<!--          {% macro render_pagination(pages, vehicles) %}-->
+<!--  <div class="page-items">-->
+<!--    {{ pages.first }} - {{ pages.last }} of {{ pages.total }}-->
+<!--  </div>-->
+<!--  <div class=pagination>-->
+<!--    {% for page in pages.iter_pages() %}-->
+<!--      {% if page %}-->
+<!--        {% if page != pages.page %}-->
+<!--          <a href="{{ url_for('vehicles', page=page) }}">{{ page }}</a>-->
+<!--        {% else %}-->
+<!--          <strong>{{ page }}</strong>-->
+<!--        {% endif %}-->
+<!--      {% else %}-->
+<!--        <span class=ellipsis>…</span>-->
+<!--      {% endif %}-->
+<!--    {% endfor %}-->
+<!--  </div>-->
+<!--{% endmacro %}-->
+<!--          <ul>-->
+<!--            <li><a href="#"><i class="bi bi-chevron-left"></i></a></li>-->
+<!--            <li><a href="#">1</a></li>-->
+<!--            <li><a href="#" class="active">2</a></li>-->
+<!--            <li><a href="#">3</a></li>-->
+<!--            <li><a href="#">4</a></li>-->
+<!--            <li>...</li>-->
+<!--            <li><a href="#">10</a></li>-->
+<!--            <li><a href="#"><i class="bi bi-chevron-right"></i></a></li>-->
+<!--          </ul>-->
+            <ul id="pagination">
+    <!-- Previous Page -->
+    <li class="{% if not pages.has_prev %}disabled{% endif %}">
+        <a href="?page={{ pages.prev_num if pages.has_prev else '#' }}">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+    </li>
+
+    <!-- Page Numbers -->
+    {% for page in pages.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
+        {% if page %}
+            <li class="{% if page == pages.page %}active{% endif %}">
+                <a href="?page={{ page }}">{{ page }}</a>
+            </li>
         {% else %}
-          <strong>{{ page }}</strong>
-        {% endif %}
-      {% else %}
-        <span class=ellipsis>…</span>
-      {% endif %}
-    {% endfor %}
-  </div>
-{% endmacro %}
-          <ul>
-            <li><a href="#"><i class="bi bi-chevron-left"></i></a></li>
-            <li><a href="#">1</a></li>
-            <li><a href="#" class="active">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
             <li>...</li>
-            <li><a href="#">10</a></li>
-            <li><a href="#"><i class="bi bi-chevron-right"></i></a></li>
-          </ul>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Next Page -->
+    <li class="{% if not pages.has_next %}disabled{% endif %}">
+        <a href="?page={{ pages.next_num if pages.has_next else '#' }}">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </li>
+</ul>
+
         </div>
       </div>
 
@@ -345,7 +405,10 @@
   <script src="static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
 
   <!-- Main JS File -->
+  <script src="static/assets/js/htmx.js"></script>
+  <script src="static/assets/js/search.js"></script>
   <script src="static/assets/js/main.js"></script>
+
 
 </body>
 

@@ -124,19 +124,80 @@ function handleDocumentClick(event) {
     console.log(`someMethodIThinkMightBeSlow took ${duration}ms`);
 }
 
-// Add an event listener to the input field
-var inputField = document.getElementById("myInput");
-inputField.addEventListener("input", function() {
+function addEventOnInput() {
     // Attach the document click listener only when the user types in the input
     document.addEventListener("click", handleDocumentClick);
-});
+}
 
-// Get the form element with the id "myForm"
-var myForm = document.getElementById("myForm");
 
-// Add an event listener to the form for the 'submit' event
-myForm.addEventListener("submit", function(event) {
-    // Prevent the default search (form submission) behavior
-    event.preventDefault();
-    console.log("Default search function of #myForm disabled");
-});
+function onFormSubmit(event) {
+        // Prevent the default search (form submission) behavior
+        event.preventDefault();
+        console.log("Default search function of #myForm disabled");
+}
+
+
+function chooseFilter(event) {
+    var filterActions = document.getElementById("filter-actions");
+    // Check if the clicked element is a button
+    if (event.target && event.target.tagName === "BUTTON") {
+        // Remove the 'active' class from all buttons
+        const buttons = filterActions.getElementsByClassName("toggle-btn");
+        for (let button of buttons) {
+            button.classList.remove("active");
+        }
+
+        // Add the 'active' class to the clicked button
+        event.target.classList.add("active");
+    }
+};
+
+  function performSearch() {
+    const formData = {
+        keyword: document.getElementById('keyword').value,
+        brand: document.getElementById('brand').value,
+        model: document.getElementById('model').value,
+        price: Array.from(document.querySelectorAll('input[name="price"]:checked')).map(cb => cb.value),
+        availability: document.querySelector('.toggle-btn.active').dataset.value,
+        // features: Array.from(document.getElementById('features').selectedOptions).map(opt => opt.value)
+    };
+
+    fetch('/vehicles', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text(); // Return the response as HTML
+    })
+    .then(html => {
+        // Update the part of the page with the new HTML
+        document.getElementById('results-container').innerHTML = html;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function clearFilters() {
+    document.getElementById('searchForm').reset();
+    document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.toggle-btn[data-value="all"]').classList.add('active');
+    performSearch();
+}
+
+function toggleFilterForm() {
+            const form = document.getElementById("target");
+            const button = document.getElementById('filterButton');
+
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+                button.textContent = 'Hide filters';
+            } else {
+                form.style.display = 'none';
+                button.textContent = 'Show filters';
+            }
+        }

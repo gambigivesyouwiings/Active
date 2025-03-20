@@ -1,0 +1,26 @@
+<div class="row gy-5">
+
+          {% for page in pages %}
+
+          <div class="col-lg-4 col-md-6">
+            <article>
+
+              <div class="post-img">
+                <img src='{{page.folder_name + "/" + page.img_url.strip("[]").split(",")[1].strip().strip("\'")}}' alt="" class="img-fluid">
+              </div>
+
+              <div class="meta-top">
+                <ul>
+                  <li class="d-flex align-items-center"><a href="blog-details.html">{{page.brand.capitalize()}}</a></li>
+                  <li class="d-flex align-items-center"><i class="bi bi-dot"></i> <a href="blog-details.html"><time>{{page.model_year}}</time></a></li>
+                </ul>
+              </div>
+
+              <h2 class="title">
+                <a href="{{ url_for('blog_details', post_id=page.id) }}">{{page.title.capitalize()}}</a>
+              </h2>
+
+            </article>
+          </div><!-- End post list item -->
+          {% endfor %}
+        </div><!-- End blog posts list -->

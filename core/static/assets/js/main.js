@@ -185,7 +185,7 @@
         features: Array.from(document.getElementById('features').selectedOptions).map(opt => opt.value)
     };
 
-    fetch('/search', {
+    fetch('/search2', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
