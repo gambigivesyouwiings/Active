@@ -96,6 +96,7 @@
             <p data-aos="fade-up" data-aos-delay="100">You order We deliver</p>
 
             <form action="#" class="form-search d-flex align-items-stretch mb-0" data-aos="fade-up" data-aos-delay="200" id="myForm" onsubmit="onFormSubmit(event)">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
               <input type="text" class="form-control" id="myInput" placeholder="Search for Vehicle type" name="query" hx-get="/search" hx-swap="outerHTML" hx-trigger="keyup delay:500ms"  hx-target="#results" oninput="addEventOnInput()">
               <button type="submit" class="btn btn-primary">Search</button>
             </form>

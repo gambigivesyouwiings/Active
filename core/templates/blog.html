@@ -101,19 +101,20 @@
     <!-- templates/search_widget.html -->
 <div class="search-widget" id="target">
     <form id="searchForm" onsubmit="return false;">
+        <input type="hidden" id="csrf" name="csrf_token" value="{{ csrf_token }}">
         <div class="filter-section">
             <input type="text" id="keyword" name="keyword" placeholder="Enter keyword" class="search-input">
             <div class="row">
             <div class="col-2 filter-group">
                 <label>Brand</label>
-                <select name="brand" id="brand" class="filter-select" hx-post="/options" hx-trigger="change" hx-target="#model">
+                <select title="brand" name="brand" id="brand" class="filter-select" hx-post="{{url_for('options')}}" hx-trigger="change" hx-target="#model">
                     <option value="all">All brands</option>
                     {% for brand in brands %}
                     <option value="{{ brand }}">{{ brand }}</option>
                     {% endfor %}
                 </select>
                 <label>Model</label>
-                <select name="model" id="model" class="filter-select">
+                <select name="model" title="model" id="model" class="filter-select">
                     <option value="all">All Models</option>
                 </select>
             </div>
@@ -175,8 +176,8 @@
 <!--            </div>-->
 
             <div class="col-2 filter-actions">
-                <button type="button" onclick="clearFilters()" class="btn btn-primary clear-button">Clear all</button>
-                <button type="button" onclick="performSearch()" class="btn btn-primary search-button">Search</button>
+                <button type="button" title="clear" onclick="clearFilters()" class="btn btn-primary clear-button">Clear all</button>
+                <button type="button" title="search" onclick="performSearch()" class="btn btn-primary search-button">Search</button>
             </div>
             </div>
         </div>
