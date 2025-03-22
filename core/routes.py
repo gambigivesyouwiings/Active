@@ -1,5 +1,5 @@
 from flask import render_template, request, abort, redirect, url_for, flash, make_response, jsonify
-from flask_wtf.csrf import CSRFError
+from flask_wtf.csrf import CSRFError, generate_csrf
 from core import app, db, login_manager, send_email, generate_token, confirm_token
 from core.models import Catalogue, Users
 from core.forms import CreatePostForm, RegisterForm, LoginForm
@@ -14,6 +14,8 @@ import shutil
 from pathlib import Path
 from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
+
+
 
 def create_app():
     with app.app_context():
@@ -70,9 +72,15 @@ def admin_only(f):
     return wrapper
 
 
+@app.before_request
+def redirect_to_www():
+    if request.host == "mushroommotors.com":
+        return redirect(f"https://www.mushroommotors.com", code=301)
+
+
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html", csrf_token=generate_csrf())
 
 
 @app.route("/contact_us", methods=["GET", "POST"])
@@ -82,11 +90,11 @@ def contact():
         email = request.form["email"]
         subject = request.form["subject"]
         message = request.form["message"]
-        send_email(to="mushroommotors@gmail.com", subject=subject, template=f"<div><p>You have a message from: {name} {email}</p><br><p>{message}</p></div>")
+        send_email(to="gambikimathi@gmail.com", subject=subject, template=f"<div><p>You have a message from: {name} {email}</p><br><p>{message}</p></div>")
         # if email != "":
         #     flash("Your message has been sent. Thank you!")
         print(email)
-    return render_template("contact.html")
+    return render_template("contact.html", csrf_token=generate_csrf())
 
 
 @app.route("/services", methods=["GET", "POST"])
@@ -104,6 +112,15 @@ def portfolio():
 @app.route("/about_us")
 def about():
     return render_template("about.html")
+
+
+@app.route('/vehicles', methods=['OPTIONS'])
+def handle_options():
+    response = make_response()
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
 
 
 @app.route("/vehicles", methods=["GET", "POST"])
@@ -172,7 +189,7 @@ def blog():
         return render_template("filter_vehicles.html", pages=vehicles)
 
     pages = db.paginate(db.select(Catalogue).order_by(Catalogue.model_year), page=page, per_page=per_page)
-    return render_template("blog.html", pages=pages, brands=unique)
+    return render_template("blog.html", pages=pages, brands=unique, csrf_token=generate_csrf())
 
 
 @app.route("/team")
@@ -225,6 +242,7 @@ def search():
         return render_template("noresults.html")
 
     return render_template("search.html", results=results)
+
 
 
 @app.route("/options", methods=["POST"])

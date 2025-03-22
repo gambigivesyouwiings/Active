@@ -153,12 +153,14 @@ function chooseFilter(event) {
 };
 
   function performSearch() {
+
+    var csrfToken = document.getElementById('csrf').value
     const formData = {
         keyword: document.getElementById('keyword').value,
         brand: document.getElementById('brand').value,
         model: document.getElementById('model').value,
         price: Array.from(document.querySelectorAll('input[name="price"]:checked')).map(cb => cb.value),
-        availability: document.querySelector('.toggle-btn.active').dataset.value,
+        availability: document.querySelector('.toggle-btn.active').dataset.value
         // features: Array.from(document.getElementById('features').selectedOptions).map(opt => opt.value)
     };
 
@@ -166,6 +168,7 @@ function chooseFilter(event) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
         },
         body: JSON.stringify(formData)
     })
@@ -186,7 +189,6 @@ function clearFilters() {
     document.getElementById('searchForm').reset();
     document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('.toggle-btn[data-value="all"]').classList.add('active');
-    performSearch();
 }
 
 function toggleFilterForm() {
