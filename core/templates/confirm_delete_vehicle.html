@@ -1,0 +1,23 @@
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+      <div class="modal-header">
+    <h5 class="modal-title">Delete vehicle</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <p>Are you sure you want to delete the vehicle <strong>{{ vehicle.brand }}</strong> {{ vehicle.title }}?</p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <button
+        class="btn btn-danger"
+        hx-delete="{{ url_for('delete_vehicle', post_id=vehicle.id) }}"
+        hx-target="#vehicle-{{ vehicle.id }}"
+        hx-swap="outerHTML"
+        data-bs-dismiss="modal"
+        >
+        Confirm
+    </button>
+</div>
+      </div>
+</div>

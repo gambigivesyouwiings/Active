@@ -2,9 +2,10 @@ from flask import render_template, request, abort, redirect, url_for, flash, mak
 from flask_wtf.csrf import CSRFError, generate_csrf
 from core import app, db, login_manager, send_email, generate_token, confirm_token
 from core.models import Catalogue, Users
-from core.forms import CreatePostForm, RegisterForm, LoginForm
+from core.forms import CreatePostForm, RegisterForm, LoginForm, EditForm, EditProfileForm
 import time
 from sqlalchemy.exc import IntegrityError, ProgrammingError
+from sqlalchemy import desc, or_, and_
 from functools import wraps
 from flask_login import login_user, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,7 +15,7 @@ import shutil
 from pathlib import Path
 from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
-
+import re
 
 
 def create_app():
@@ -23,9 +24,10 @@ def create_app():
 
 
 def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fuel, transmission, mileage, drive_type,
-              folder, extras, availability="local", reserved=False, title="untitled"):
-    new_post = Catalogue(title=title,
-                         brand=brand,
+              folder, extras, description, availability="local", condition="Foreign used", user_id=0, reserved=False,
+              title="untitled"):
+    new_post = Catalogue(title=title.capitalize(),
+                         brand=brand.capitalize(),
                          vehicle_type=vehicle_type,
                          model_year=model_year,
                          engine_rating=engine_rating,
@@ -37,7 +39,10 @@ def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fu
                          extras=extras,
                          folder_name=folder,
                          img_url=img_url,
+                         condition=condition,
+                         description=description,
                          availability=availability,
+                         user_id=user_id,
                          reserved=reserved)
 
     with app.app_context():
@@ -65,11 +70,26 @@ def csrf_error(e):
 def admin_only(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        if current_user.email not in admin_list or not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+
+    return wrapper
+
+
+def super_admin_only(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
         if current_user.email not in admin_list:
             abort(403)
         return f(*args, **kwargs)
 
     return wrapper
+
+
+@app.template_filter('number_format')
+def number_format(value):
+    return f"{int(value):,}"
 
 
 @app.before_request
@@ -78,9 +98,84 @@ def redirect_to_www():
         return redirect(f"https://www.mushroommotors.com", code=301)
 
 
-@app.route("/")
+@app.route("/", methods=["POST", "GET"])
 def home():
-    return render_template("index.html", csrf_token=generate_csrf())
+    unique_brands = db.session.query(Catalogue.brand).distinct().all()
+    unique = [category[0] for category in unique_brands]
+
+    if request.method == "POST":
+        page = 1
+        per_page = 10
+        # Get JSON data from the request
+        form_data = request.form
+
+        # Start with the base query
+        query = Catalogue.query
+
+        # Apply filters only if the corresponding value is not empty
+        if form_data.get('keyword'):
+            print("active")
+            keyword = form_data['keyword'].strip()
+            query = query.filter(
+                (Catalogue.brand.ilike(f'%{keyword}%')) | (Catalogue.title.ilike(f'%{keyword}%'))
+            )
+
+        if form_data.get('brand') and form_data.get('brand') != "all":
+            brand = form_data['brand'].strip()
+            query = query.filter(Catalogue.brand == brand)
+            print(query)
+
+        if form_data.get('model') != "all":
+            print(form_data.get('model'))
+            model = form_data['model'].strip()
+            query = query.filter(Catalogue.title == model)
+
+        if form_data.getlist('price') and len(form_data.getlist('price')) > 0:
+            price_ranges = form_data.getlist('price')
+            price_filters = []
+            for price_range in price_ranges:
+                try:
+                    if price_range == "Above 10M":
+                        price_filters.append(Catalogue.price > 10000000)
+                    else:
+                        print("no")
+                        min_price, max_price = map(
+                            lambda x: int(x.replace('K', '000').replace('M', '000000').strip()),
+                            price_range.split('-')
+                        )
+                        price_filters.append(and_(Catalogue.price >= min_price, Catalogue.price <= max_price))
+                except ValueError:
+                    print("error detected")
+                    continue  # Ignore invalid price formats
+            query = query.filter(or_(*price_filters))
+        if form_data.get('availability'):
+            availability = form_data['availability'].strip()
+            if availability == "local":
+                query = query.filter(Catalogue.availability == "local")
+            elif availability == "import":
+                query = query.filter(Catalogue.availability == "import")
+            # For 'all', no additional filtering is applied
+
+        order = form_data.get('order')
+        if order == "old model":
+            query = query.order_by(Catalogue.model_year)
+        elif order == "mileage":
+            query = query.order_by(Catalogue.mileage)
+        elif order == "name ascending":
+            query = query.order_by(Catalogue.title)
+        elif order == "name descending":
+            query = query.order_by(desc(Catalogue.title))
+        else:
+            # Execute the query and return the results
+            query = query.order_by(desc(Catalogue.model_year))
+
+        # Paginate the query results
+        vehicles = query.paginate(page=page, per_page=per_page)
+        return render_template("blog.html", num=page, admin_list=admin_list, pages=vehicles, brands=unique,
+                               csrf_token=generate_csrf())
+    last_six_entries = Catalogue.query.order_by(Catalogue.id.desc()).limit(6).all()
+    return render_template("index.html", admin_list=admin_list, csrf_token=generate_csrf(), brands=unique,
+                           pages=last_six_entries)
 
 
 @app.route("/contact_us", methods=["GET", "POST"])
@@ -90,7 +185,8 @@ def contact():
         email = request.form["email"]
         subject = request.form["subject"]
         message = request.form["message"]
-        send_email(to="gambikimathi@gmail.com", subject=subject, template=f"<div><p>You have a message from: {name} {email}</p><br><p>{message}</p></div>")
+        send_email(to="mushroommotors25@gmail.com", subject=subject,
+                   template=f"<div><p>You have a message from: {name} {email}</p><br><p>{message}</p></div>")
         # if email != "":
         #     flash("Your message has been sent. Thank you!")
         print(email)
@@ -130,6 +226,9 @@ def blog():
     # Get the page number from the query string
     page = int(request.args.get('page', 1))
     per_page = 10  # Number of items per page
+    selected_brand = request.args.get('selected_brand')
+    selected_type = request.args.get('selected_type')
+    selected_user = request.args.get('selected_user')
 
     if request.method == "POST":
         # Get JSON data from the request
@@ -140,7 +239,6 @@ def blog():
 
         # Apply filters only if the corresponding value is not empty
         if form_data.get('keyword'):
-            print("active")
             keyword = form_data['keyword'].strip()
             query = query.filter(
                 (Catalogue.brand.ilike(f'%{keyword}%')) | (Catalogue.title.ilike(f'%{keyword}%'))
@@ -149,30 +247,29 @@ def blog():
         if form_data.get('brand') and form_data.get('brand') != "all":
             brand = form_data['brand'].strip()
             query = query.filter(Catalogue.brand == brand)
-            print(query)
 
         if form_data.get('model') != "all":
-            print(form_data.get('model'))
             model = form_data['model'].strip()
             query = query.filter(Catalogue.title == model)
 
         if form_data.get('price') and len(form_data['price']) > 0:
             price_ranges = form_data['price']
+            price_filters = []
             for price_range in price_ranges:
                 try:
                     if price_range == "Above 10M":
-                        query = query.filter(Catalogue.price > 10000000)
-
+                        price_filters.append(Catalogue.price > 10000000)
                     else:
+                        print("no")
                         min_price, max_price = map(
                             lambda x: int(x.replace('K', '000').replace('M', '000000').strip()),
                             price_range.split('-')
                         )
-                        query = query.filter(Catalogue.price >= min_price, Catalogue.price <= max_price)
-
+                        price_filters.append(and_(Catalogue.price >= min_price, Catalogue.price <= max_price))
                 except ValueError:
                     print("error detected")
                     continue  # Ignore invalid price formats
+            query = query.filter(or_(*price_filters))
         if form_data.get('availability'):
             availability = form_data['availability'].strip()
             if availability == "local":
@@ -181,15 +278,57 @@ def blog():
                 query = query.filter(Catalogue.availability == "import")
             # For 'all', no additional filtering is applied
 
-        # Execute the query and return the results
-        query = query.order_by(Catalogue.model_year)
+        order = form_data.get('order')
+        if order == "old model":
+            query = query.order_by(Catalogue.model_year)
+        elif order == "mileage":
+            query = query.order_by(Catalogue.mileage)
+        elif order == "name ascending":
+            query = query.order_by(Catalogue.title)
+        elif order == "name descending":
+            query = query.order_by(desc(Catalogue.title))
+        else:
+            # Execute the query and return the results
+            query = query.order_by(desc(Catalogue.model_year))
 
         # Paginate the query results
         vehicles = query.paginate(page=page, per_page=per_page)
-        return render_template("filter_vehicles.html", pages=vehicles)
+        return render_template("filter_vehicles.html", num=page, pages=vehicles)
 
-    pages = db.paginate(db.select(Catalogue).order_by(Catalogue.model_year), page=page, per_page=per_page)
-    return render_template("blog.html", pages=pages, brands=unique, csrf_token=generate_csrf())
+    if selected_brand:
+        query = Catalogue.query
+        query = query.filter(
+            Catalogue.title.ilike(f"%{selected_brand}%") | Catalogue.brand.ilike(f"%{selected_brand}%"))
+        query = query.order_by(desc(Catalogue.model_year))
+        pages = query.paginate(page=page, per_page=per_page)
+        return render_template("blog.html", num=page, pages=pages, admin_list=admin_list, brands=unique,
+                               csrf_token=generate_csrf())
+    if selected_type:
+        query = Catalogue.query
+        query = query.filter(
+            Catalogue.vehicle_type.ilike(f"%{selected_type}%"))
+        query = query.order_by(desc(Catalogue.model_year))
+        pages = query.paginate(page=page, per_page=per_page)
+        return render_template("blog.html", num=page, admin_list=admin_list, pages=pages, brands=unique,
+                               csrf_token=generate_csrf())
+
+    if selected_user:
+        query = Catalogue.query
+
+        # Filter by user_id
+        query = query.filter(Catalogue.user_id == selected_user)
+
+        # Order by model_year in descending order
+        query = query.order_by(desc(Catalogue.model_year))
+
+        # Paginate the results
+        pages = query.paginate(page=page, per_page=per_page)
+        return render_template("blog.html", num=page, admin_list=admin_list, pages=pages, brands=unique,
+                               csrf_token=generate_csrf())
+
+    pages = db.paginate(db.select(Catalogue).order_by(desc(Catalogue.model_year)), page=page, per_page=per_page)
+    return render_template("blog.html", num=page, pages=pages, admin_list=admin_list, brands=unique,
+                           csrf_token=generate_csrf())
 
 
 @app.route("/team")
@@ -207,8 +346,7 @@ def blog_details(post_id):
     try:
         post = db.session.query(Catalogue).filter_by(id=post_id).first()
     except ProgrammingError:
-        posts = []
-        create_app()
+        images = []
     else:
         folder = post.folder_name
         data = post.img_url
@@ -222,11 +360,27 @@ def blog_details(post_id):
 
     number = int(post.price)
     price = f"{number:,}"
+    features = post.extras.split(",")
+    feature = [x.strip() for x in features if len(x.split(":")) <= 1]
+    spects = {
+        x.split(":")[0].strip(): x.split(":")[1].strip()
+        for x in re.split(r"[,;]", post.extras) if ":" in x
+    }
+    if post.user_id:
+        user = db.session.query(Users).filter_by(id=post.user_id).first()
+        if user:
+            phone_number = user.phone
+        else:
+            phone_number = "+254732252382"
 
-    return render_template("blog-details.html", images=images, post=post, price=price)
+    else:
+        phone_number = "+254732252382"
+
+    return render_template("blog-details.html", phone_number=phone_number, specs=spects, features=feature,
+                           images=images, post=post, price=price, csrf_token=generate_csrf())
 
 
-@app.route('/search')
+@app.route('/search', methods=["GET", "POST"])
 def search():
     query = request.args.get("query")
     print(query)
@@ -244,7 +398,6 @@ def search():
     return render_template("search.html", results=results)
 
 
-
 @app.route("/options", methods=["POST"])
 def options():
     brand = request.form.get('brand')
@@ -258,27 +411,32 @@ def options():
 @app.route("/pre_delete/<int:index>", methods=["GET", "POST"])
 @admin_only
 def pre_delete(index):
-    return render_template("delete.html", id=index)
+    vehicle = Catalogue.query.get_or_404(index)
+    if not current_user.is_admin:
+        abort(403)  # Restrict to admins
+    return render_template('confirm_delete_vehicle.html', vehicle=vehicle)
 
 
-@app.route("/delete/<int:post_id>", methods=["GET", "POST"])
+@app.route("/delete/<int:post_id>", methods=["DELETE"])
 @admin_only
-def delete(post_id):
-    blog_to_delete = db.session.query(Catalogue).filter_by(id=post_id).first()
-    if blog_to_delete.img_url:
-        try:
-            os.remove(blog_to_delete.img_url)
-        except FileNotFoundError:
-            pass
-    if blog_to_delete.video_url:
-        try:
-            os.remove(blog_to_delete.video_url)
-        except FileNotFoundError:
-            pass
+def delete_vehicle(post_id):
+    vehicle = Catalogue.query.get_or_404(post_id)
+    profile = Users.query.get_or_404(current_user.id)
+    if profile.deletions:
+        profile.deletions += 1
+    else:
+        profile.deletions = 1
+    # Extract image URLs and paths
+    folder = vehicle.folder_name
+    try:
+        shutil.rmtree(f"core/{folder}")
+    except shutil.Error:
+        flash("An error occurred, can't delete!", "danger")
+        return redirect(url_for('blog'))
 
-    db.session.delete(blog_to_delete)
+    db.session.delete(vehicle)
     db.session.commit()
-    return redirect(url_for('home'))
+    return '', 200  # HTMX expects an empty response
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -286,7 +444,13 @@ def delete(post_id):
 @admin_only
 def upload():
     form = CreatePostForm()
-    if request.method == 'POST':
+
+    if form.validate_on_submit():
+        profile = Users.query.get_or_404(current_user.id)
+        if profile.posts_made:
+            profile.posts_made += 1
+        else:
+            profile.posts_made = 1
         uploaded_files = []
         new_name = datetime.now().strftime("%Y%m%d%S%f")
         destination = os.path.join("core/static/assets/cars/", new_name)
@@ -296,11 +460,10 @@ def upload():
                 print(f"Directory created: {destination}")
         except OSError as e:
             print(f"Error creating directory: {e}")
-        files = request.files.getlist(form.file)  # Fetch all uploaded files
+        # files = request.files.getlist(form.file)  # Fetch all uploaded files
 
         for file in form.file.data:
             # Process each file (e.g., save to a directory)
-            print("((file")
             file_name = secure_filename(file.filename)
             file.save(f'{destination}/{file_name}')
             uploaded_files.append(file_name)
@@ -318,9 +481,13 @@ def upload():
             drive_type=form.drive_type.data,
             folder=f"/static/assets/cars/{new_name}",  # Using the brand as the folder name for simplicity
             extras=form.extras.data,
+            description=form.description.data,
             availability=form.availability.data,  # This can be extended for user input or other logic
+            condition=form.condition.data,
+            user_id=current_user.id,
             title=f"{form.model.data}"  # Combine brand and model for the title
-            )
+        )
+
         flash("Post created successfully!", "success")
         return redirect(url_for('upload'))
 
@@ -404,57 +571,175 @@ def upload2():
     return render_template("upload.html", form=form)
 
 
+@app.route("/edit-profile/<int:index>", methods=["GET", "POST"])
+@login_required
+@admin_only
+def edit_profile(index):
+    form = EditProfileForm()
+    if current_user.id != index:
+        abort(403)  # Restrict to admins
+    profile = Users.query.get_or_404(index)
+
+    # Populate form fields for GET requests
+    if request.method == 'GET':
+        form.name.data = profile.name
+        form.phone_number.data = profile.phone
+
+    if form.validate_on_submit():
+        profile.name = form.name.data
+        profile.phone = form.phone_number.data
+        db.session.commit()  # Save changes to the database
+        return redirect(url_for('home'))
+
+    return render_template("edit_profile.html", form=form, user=profile)
+
+
 # This route is for editing a blog post thumbnail, title etc.
-@app.route("/edit-post/<index>", methods=["GET", "POST"])
+@app.route("/edit-post/<int:index>", methods=["GET", "POST"])
 @login_required
 @admin_only
 def edit(index):
-    edit_form = CreatePostForm()
-    blog_to_edit = db.session.query(Catalogue).filter_by(id=index).first()
+    form = EditForm()
+    vehicle = Catalogue.query.get_or_404(index)
+    page = int(request.args.get('page', 1))
 
-    if edit_form.validate_on_submit():
-        img_to_remove = request.args.get("img_to_remove")
-        file = edit_form.file.data
+    # Extract image URLs and paths
+    folder = vehicle.folder_name
+    urls = [url.strip().strip("'") for url in vehicle.img_url.strip("[]").split(",")]
+    images = [os.path.join(folder, url) for url in urls]
 
-        # This filters any non-image file types
-        try:
-            file.save(file.filename)
-            image = Image.open(file.filename)
-            img_resize = image.resize((417, 597))
-            img_resize.save(file.filename)
+    # Populate form fields for GET requests
+    if request.method == 'GET':
+        form.brand.data = vehicle.brand
+        form.model.data = vehicle.title
+        form.vehicle_type.data = vehicle.vehicle_type
+        form.model_year.data = vehicle.model_year
+        form.engine_rating.data = vehicle.engine_rating
+        form.price.data = vehicle.price
+        form.mileage.data = vehicle.mileage
+        form.fuel.data = vehicle.fuel
+        form.transmission.data = vehicle.transmission
+        form.drive_type.data = vehicle.drive_type
+        form.availability.data = vehicle.availability
+        form.extras.data = vehicle.extras
+        form.condition.data = vehicle.condition or 'Foreign-used'
+        form.description.data = vehicle.description or 'N/A'
 
-        except UnidentifiedImageError:
-            os.remove(file.filename)
-            flash("That's not an image file!")
-            return redirect(url_for('edit', index=index))
+    if form.validate_on_submit():
+        profile = Users.query.get_or_404(current_user.id)
 
-        # This moves the uploaded file to the videos folder from the project root
-
-        destination = f"static/assets/videos/"
-        try:
-            shutil.move(file.filename, destination)
-        except shutil.Error:
-            os.remove(file.filename)
-            flash("That file already exists")
-            return redirect(url_for('edit', index=index))
+        if profile.edits:
+            profile.edits += 1
         else:
-            image_file = destination + file.filename
+            profile.edits = 1
 
-        # This removes the original image after successfully moving the new file
-        try:
-            if img_to_remove != image_file:
-                os.remove(img_to_remove)
-        except FileNotFoundError:
-            pass
-        except TypeError:
-            pass
-        flash("Files Uploaded Successfully!")
+        # Update vehicle details from form data
+        for field in ['brand', 'vehicle_type', 'model_year', 'engine_rating',
+                      'price', 'mileage', 'fuel', 'transmission', 'drive_type', 'availability', 'extras', 'condition',
+                      'description']:
+            setattr(vehicle, field, getattr(form, field).data)
 
-        # now to effect these changes in the database
-        blog_to_edit.img_url = image_file
-        db.session.commit()
-        return redirect(url_for('home'))
-    return render_template("edit.html", form=edit_form)
+        vehicle.title = form.model.data
+        if form.stock.data == "sold":
+            vehicle.sold = True
+        elif form.stock.data == "reserved":
+            vehicle.reserved = True
+        else:
+            vehicle.reserved = False
+            vehicle.sold = False
+
+        # Process thumbnail assignment first
+        thumbnail_image_id = request.form.get("thumbnail_image")  # Thumbnail index (optional)
+        thumbnail = None
+        if thumbnail_image_id:
+            thumbnail_idx = int(thumbnail_image_id)
+            if thumbnail_idx < len(urls):  # Ensure index is valid
+                thumbnail = urls[thumbnail_idx]
+
+        # Process image deletion
+        selected_images = request.form.getlist('delete_images')  # Image indices to delete
+        if selected_images:
+            selected_indices = list(map(int, selected_images))  # Convert indices to integers
+            for idx in selected_indices:
+                try:
+                    os.remove(images[idx])  # Remove physical file
+                except FileNotFoundError:
+                    print(f"File {images[idx]} not found.")
+            # Remove URLs from the list in reverse order to prevent index shifting
+            for idx in sorted(selected_indices, reverse=True):
+                del urls[idx]
+
+        # Move the thumbnail to the front if it's valid and not marked for deletion
+        if thumbnail and thumbnail not in urls:
+            flash("Thumbnail cannot be set as it has been deleted.", "warning")
+        elif thumbnail and thumbnail in urls:
+            urls.remove(thumbnail)
+            urls.insert(0, thumbnail)
+
+        # Process new file uploads
+        if form.file.data and any(file.filename for file in form.file.data):
+            for file in form.file.data:
+                if file.filename:  # Only process files with a valid filename
+                    file_name = secure_filename(file.filename)
+                    file_path = f'core/{folder.strip("/")}/{file_name}'
+                    file.save(file_path)
+                    urls.append(file_name)
+
+        # Update vehicle image URLs
+        vehicle.img_url = f"[{', '.join(urls)}]"
+
+        if not vehicle.user_id:
+            vehicle.user_id = current_user.id
+
+        db.session.commit()  # Save changes to the database
+        return redirect(url_for('blog', page=page))  # Redirect after successful update
+
+    return render_template('edit.html', images=images, form=form, vehicle=vehicle)
+
+
+# if edit_form.validate_on_submit():
+#     img_to_remove = request.args.get("img_to_remove")
+#     file = edit_form.file.data
+#
+#     # This filters any non-image file types
+#     try:
+#         file.save(file.filename)
+#         image = Image.open(file.filename)
+#         img_resize = image.resize((417, 597))
+#         img_resize.save(file.filename)
+#
+#     except UnidentifiedImageError:
+#         os.remove(file.filename)
+#         flash("That's not an image file!")
+#         return redirect(url_for('edit', index=index))
+#
+#     # This moves the uploaded file to the videos folder from the project root
+#
+#     destination = f"static/assets/videos/"
+#     try:
+#         shutil.move(file.filename, destination)
+#     except shutil.Error:
+#         os.remove(file.filename)
+#         flash("That file already exists")
+#         return redirect(url_for('edit', index=index))
+#     else:
+#         image_file = destination + file.filename
+#
+#     # This removes the original image after successfully moving the new file
+#     try:
+#         if img_to_remove != image_file:
+#             os.remove(img_to_remove)
+#     except FileNotFoundError:
+#         pass
+#     except TypeError:
+#         pass
+#     flash("Files Uploaded Successfully!")
+#
+#     # now to effect these changes in the database
+#     vehicle.img_url = image_file
+#     db.session.commit()
+#     return redirect(url_for('home'))
+# return render_template("edit.html", form=edit_form)
 
 
 @app.errorhandler(413)
@@ -462,9 +747,56 @@ def too_large(e):
     return make_response(jsonify(message="File is too large"), 413)
 
 
-@app.route("/portfolio_det")
-def portfolio_details():
-    return render_template("portfolio-details.html")
+@app.route("/admin")
+@login_required
+@super_admin_only
+def admin():
+    users = Users.query.all()
+    return render_template("admin.html", admin_list=admin_list, csrf=generate_csrf(), users=users)
+
+
+@app.route('/toggle-admin', methods=['POST'])
+@super_admin_only
+def toggle_admin():
+    # Parse data from the form
+    user_id = request.form.get('user_id')
+    is_admin = request.form.get('is_admin') == 'true'
+
+    # Fetch the user and toggle admin status
+    user = Users.query.get_or_404(user_id)
+    user.is_admin = is_admin
+    db.session.commit()
+    status = not user.is_admin
+    # Return a partial HTML snippet with the updated checkbox state
+    return render_template("update-admin.html", id=user.id, admin=status)
+
+
+@app.route('/confirm-delete-user/<int:user_id>')
+@super_admin_only
+def confirm_delete_user(user_id):
+    user = Users.query.get_or_404(user_id)
+    if not current_user.is_admin:
+        abort(403)  # Restrict to admins
+    return render_template('confirm_delete_user.html', user=user)
+
+
+@app.route('/delete-user/<int:user_id>', methods=['DELETE'])
+@super_admin_only
+def delete_user(user_id):
+    if not current_user.is_admin:
+        abort(403)  # Only admins can delete users
+    default_user_id = 47
+    user = Users.query.get_or_404(user_id)
+    name = user.name
+    # Reassign all orphaned posts to the default user
+    posts = Catalogue.query.filter_by(user_id=user_id).all()
+    for post in posts:
+        post.user_id = default_user_id
+
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"User: {name}'s record has been deleted ")
+    return '', 200  # HTMX expects an empty response
 
 
 # Register route gets user data from form and saves to database
@@ -474,6 +806,7 @@ def register():
     if request.method == "POST":
         user = Users()
         user.name = request.form.get("name")
+        user.phone = request.form.get("phone_number")
         user.email = request.form.get("email").lower()
         user.created_on = datetime.now()
         password = request.form.get("password")
@@ -590,7 +923,7 @@ def forgot():
             send_email(user.email, subject, html)
             flash("A password reset link has been sent to your email", "success")
             return redirect(url_for("home"))
-    return render_template("forgot.html")
+    return render_template("forgot.html", csrf_token=generate_csrf())
 
 
 @app.route("/reset/<token>", methods=["GET", "POST"])

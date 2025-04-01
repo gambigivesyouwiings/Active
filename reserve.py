@@ -172,7 +172,7 @@ def blog_details(post_id):
 
 @app.route("/portfolio_det")
 def portfolio_details():
-    return render_template("portfolio-details.html")
+    return render_template("admin.html")
 
 
 if __name__ == "__main__":

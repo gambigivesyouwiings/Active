@@ -91,6 +91,22 @@ async function sendMessage() {
                 sendMessage();
             }
         }
+function handleWhatsAppKeyPress(event) {
+        if (event.key === 'Enter') {
+            const userInput = document.getElementById('userInput').value;
+
+            // Encode the message and phone number
+            const phoneNumber = '+254732252382';
+            const message = encodeURIComponent(userInput);
+
+            // Construct the WhatsApp link
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+            // Open the WhatsApp URL in a new tab or window
+            window.open(whatsappUrl, '_blank');
+        }
+    }
+
 // Function to handle the document-level click event
 function handleDocumentClick(event) {
     const startTime = performance.now();
@@ -159,11 +175,12 @@ function chooseFilter(event) {
         keyword: document.getElementById('keyword').value,
         brand: document.getElementById('brand').value,
         model: document.getElementById('model').value,
+        order: document.getElementById('feature').value,
         price: Array.from(document.querySelectorAll('input[name="price"]:checked')).map(cb => cb.value),
         availability: document.querySelector('.toggle-btn.active').dataset.value
         // features: Array.from(document.getElementById('features').selectedOptions).map(opt => opt.value)
     };
-
+1
     fetch('/vehicles', {
         method: 'POST',
         headers: {
@@ -203,3 +220,13 @@ function toggleFilterForm() {
                 button.textContent = 'Show filters';
             }
         }
+function filterItems(category) {
+      const cards = document.querySelectorAll('.check');
+      cards.forEach(card => {
+        if (card.dataset.category === category) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }

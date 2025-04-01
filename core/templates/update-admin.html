@@ -1,0 +1,7 @@
+<input
+        type="checkbox" class="form-check-input"
+        hx-post="{{ url_for('toggle_admin') }}"
+        hx-vals='{{ {"user_id": id, "is_admin": admin }  | tojson }}'
+        hx-swap="outerHTML"
+        {% if not admin %} checked {% endif %}
+>

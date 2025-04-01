@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from config import ProductionConfig
+from config import ProductionConfig, DevelopmentConfig
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_cors import CORS
@@ -14,7 +14,7 @@ from flask_wtf.csrf import CSRFProtect
 app = Flask(__name__)
 
 # Load configuration from DevelopmentConfig
-app.config.from_object(ProductionConfig)
+app.config.from_object(DevelopmentConfig)
 
 # Initialize SQLAlchemy with the app instance
 db = SQLAlchemy(app)

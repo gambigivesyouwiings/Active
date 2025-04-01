@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Mushroom Motors</title>
 </head>
 <body>
 
@@ -13,12 +13,12 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Landing page - Mushroom motors</title>
+  <title>Mushroom motors</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="/static/assets/img/favicon.png" rel="icon">
+  <link href="/static/assets/img/modern_mushroom.jpeg" rel="icon">
   <link href="/static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Fonts -->
@@ -52,35 +52,31 @@
 
       <a href="{{url_for('home')}}" class="logo d-flex align-items-center">
         <!-- Uncomment the line below if you also wish to use an image logo -->
-         <img src="/static/assets/img/logo.png" alt="">
+         <img src="/static/assets/img/modern_mushroom.jpeg" alt="">
         <h1 class="sitename"> <b>Mushroom Motors.</b></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="{{url_for('home')}}" class="active">Home</a></li>
-          <li><a href="{{url_for('about')}}">About</a></li>
-          <li><a href="{{url_for('blog')}}">Trucks</a></li>
-          <li><a href="{{url_for('blog')}}">Bikes</a></li>
+          <li><a href="{{url_for('home')}}">Home</a></li>
 <!--          <li><a href="{{url_for('team')}}">Team</a></li>-->
           <li><a href="{{url_for('blog')}}">Vehicles</a></li>
-          <li class="dropdown"><a href="{{ url_for('blog_details', post_id=1) }}"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li><a href="{{url_for('services')}}">Services</a></li>
+          <li><a href="{{url_for('about')}}">About</a></li>
+            {% if current_user.is_admin %}
+          <li class="dropdown"><a href="#" class="active"><span>Admin</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
+                {% if current_user.email in admin_list %}
+              <li><a href="{{url_for('admin')}}">Admin Control Panel</a></li>
+                {% endif %}
+              <li><a href="{{url_for('edit_profile', index=current_user.id)}}">My Profile</a></li>
+              <li><a href="{{url_for('blog', selected_user=current_user.id)}}">My Posts</a></li>
+              <li><a href="{{url_for('upload')}}">Upload</a></li>
+              <li><a href="{{url_for('register')}}">Register</a></li>
+              <li><a href="{{url_for('logout')}}">Log Out</a></li>
             </ul>
           </li>
+            {% endif %}
           <li><a href="{{url_for('contact')}}">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

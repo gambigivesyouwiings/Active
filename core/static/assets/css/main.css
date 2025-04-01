@@ -753,7 +753,7 @@ section,
 --------------------------------------------------------------*/
 .section-title {
   text-align: center;
-  padding-bottom: 60px;
+  padding-bottom: 30px;
   position: relative;
 }
 
@@ -805,9 +805,15 @@ section,
     font-size: 30px;
   }
 }
+@media (min-width: 992px){
+    #mushroom_svg {
+        margin-left:20%
+    }
+}
 
 .hero p {
   font-size: 18px;
+  font-family: var(--heading-font);
   font-weight: 400;
   margin-bottom: 40px;
 }
@@ -1113,7 +1119,73 @@ visibility: hidden;
   height: 2px;
   background: var(--accent-color);
 }
+/*--------------------------------------------------------------
+# Brands Section
+--------------------------------------------------------------*/
+.brand-card {
+      text-align: center;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      object-fit: cover;
+    }
+    .brand-card .bi-x {
+     float: right;
+     position: relative;
+     border-radius: 5px;
+     right: 10px;
+     background: none;
+     border: 1px solid #ddd;
+     font-size: 24px;
 
+    }
+    .brand-card .bi-x:hover {
+    background: rgb(255,0,64);
+    transform: scale(1.2);
+
+    }
+    .brand-logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+    .brand-name {
+      font-weight: bold;
+      color: #333;
+      transition: text-decoration 0.3s ease, color 0.3s ease;
+    }
+    /* Hover Effects */
+    .brand-card:hover {
+      cursor: pointer;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .brand-name:hover {
+      text-decoration: underline;
+      color: var(--accent-color);
+    }
+.hidden {
+      display: none;
+    }
+    .filters button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--accent-color);
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .filters button:hover {
+        border-color: var(--accent-color);
+        color: var(--contrast-color);
+        background: color-mix(in srgb, var(--accent-color), transparent 10%);
+    }
 /*--------------------------------------------------------------
 # Blog Posts Section
 --------------------------------------------------------------*/
@@ -1598,7 +1670,6 @@ visibility: hidden;
   left: 12px;
   right: 12px;
   bottom: -100%;
-  z-index: 3;
   transition: all ease-in-out 0.5s;
   background: color-mix(in srgb, var(--background-color), transparent 10%);
   padding: 15px;
@@ -1818,6 +1889,61 @@ visibility: hidden;
   padding: 0;
 }
 
+.portfolio-details .table {
+    width: 100%;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow-x: auto; /* Enable horizontal scrolling for small screens */
+    display: block; /* Ensure the table behaves as a block-level element */
+    white-space: nowrap; /* Prevent wrapping of table rows and cells */
+}
+
+.portfolio-details .table th, .table td {
+    text-align: left; /* Ensure consistent alignment */
+    padding: 10px; /* Add padding for readability */
+}
+
+.portfolio-details .badge {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.portfolio-details .form-check-input {
+    cursor: pointer;
+    transform: scale(1.2); /* Make checkboxes larger */
+}
+
+/* Media Query for Small Screens */
+@media (max-width: 768px) {
+    .portfolio-details .table {
+        font-size: 0.8rem; /* Reduce font size for smaller screens */
+    }
+
+    .portfolio-details .badge {
+        font-size: 0.75rem; /* Scale badges down on small screens */
+        padding: 3px 8px;
+    }
+
+    .portfolio-details .form-check-input {
+        transform: scale(1); /* Adjust checkbox size for smaller screens */
+    }
+}
+
+/* Optional: Improve usability for very narrow screens */
+@media (max-width: 576px) {
+    .portfolio-details .table {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        font-size: 0.7rem; /* Reduce font size further */
+    }
+
+    .portfolio-details .table th, .table td {
+        padding: 8px; /* Adjust cell padding */
+    }
+}
+
+
 /*--------------------------------------------------------------
 # Team Section
 --------------------------------------------------------------*/
@@ -1942,11 +2068,189 @@ visibility: hidden;
   overflow: hidden;
 }
 
+
+.card-standard {
+   height: auto; /* Set a fixed card height */
+    /* Ensures uniform card size */
+}
+
+.card-img-top {
+     width: 100%;
+     height: 300px; /* Ensures the image scales proportionally */
+     object-fit: cover; /* Crop the image while keeping its proportions */
+    object-position: center;
+}
+
+.card-title {
+color: black;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"
+font-weight: bold;
+display: -webkit-box;
+-webkit-line-clamp: 1; /* Number of lines */
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+
+.card-text {
+color: black;
+display: -webkit-box;
+-webkit-line-clamp: 3; /* Number of lines */
+-webkit-box-orient: vertical;
+overflow: hidden;
+font-size: 1em;
+    }
+
+.dealer-info img {
+     width: 40px; /* Adjust dealer logo size */
+     height: auto;
+}
+
+.transparent-bg {
+    position: absolute; /* Position over the image */
+     /* Align it to the left edge */
+    top: 240px;
+    width: 100%; /* Span the full width of the image */
+    background-color: color-mix(in srgb, var(--contrast-color), transparent 30%); /* 50% transparent white */
+    z-index: 2; /* Ensure it's above the image */
+    padding: 10px; /* Add spacing inside the div */
+    border-radius: 0; /* No rounding to match card edges */
+}
+
+.badge {
+     margin-right: 5px; /* Adds spacing between badges */
+     background-color: color-mix(in srgb, var(--accent-color), transparent 30%);
+     }
+
+.card-body-standard {
+     top: 50%;
+     z-index:2;
+     overflow: hidden; /* Allow content to fit within the card */
+     font-size: 1em;
+}
+
+.card-footer {
+    display: flex; /* Align elements in a row */
+    justify-content: space-between; /* Space out items horizontally */
+    align-items: center; /* Ensure vertical alignment */
+    padding: 10px;
+    border-top: 1px solid #ddd; /* Add spacing */
+    font-size: 1em;
+    width: 90%; /* Span the entire width */
+    background-color: rgba(255, 255, 255, 0.7); /* Optional transparency */
+}
+
+.availability {
+position: absolute;
+float: right;
+right: 20px;
+top: 20px;
+padding:3%;
+font-size: 0.85rem;
+color: black;
+}
+
+.sold {
+position: absolute;
+float: right;
+right: 20px;
+top: 20px;
+padding:3%;
+font-size: 1.0rem;
+color: black;
+background-color: color-mix(in srgb, red, transparent 30%) !important
+}
+
+.reserved {
+position: absolute;
+float: right;
+right: 20px;
+top: 20px;
+padding:3%;
+font-size: 0.85rem;
+background-color: color-mix(in srgb, grey, transparent 30%);
+color: black;
+}
+
+ .edit-deleteone {
+position: absolute;
+float: left;
+left: 20px;
+padding: 1%;
+top: 20px;
+background-color: color-mix(in srgb, var(--default-color), transparent 30%);
+color: black;
+font-size: 0.85rem
+}
+
+ .edit-deletetwo {
+color: var(--contrast-color);
+}
+
+.verified {
+position: absolute;
+float: right;
+left: 50%;
+top: 10px;
+padding:3%;
+color: black;
+}
+
+.md_contact{
+  background-color: var(--accent-color);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease
+}
+
+.md_contact:hover {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 30%);
+    }
+.row {
+    margin: 0 auto; /* Center the row in the viewport */
+    padding: 15px;
+}
+
+.col-lg-4, .col-md-6 {
+    margin-bottom: 30px; /* Space between columns */
+}
+
+h5 .badge {
+    font-size: 0.9rem; /* Consistent badge size */
+    margin-right: 5px;
+}
+
+.post-image {
+    width: 349px;
+   height: 263.25px
+   object-fit: contain;
+   margin-bottom: 10px;
+   transition: transform 0.3s ease;
+    }
+
+   .seller-available{
+     float: right;
+     position: relative;
+     top: 50px;
+     right: 5px;
+     padding: 3px;
+     background-color: var(--accent-color);
+     border: none;
+     border-radius: 5px;
+     font-size: 14px;
+     text-transform: uppercase;
+     font-weight: 5;
+     cursor: pointer;
+
+    }
+
 .blog-posts-2 .title {
   font-size: 20px;
   font-weight: 700;
   padding: 0;
   margin: 5px 0;
+  text-align: left;
 }
 
 .blog-posts-2 .title a {
@@ -2006,6 +2310,10 @@ visibility: hidden;
 
 #target{
 display: None;
+}
+
+#target .default-show {
+display: flex;
 }
 
 .search-input {
@@ -2205,6 +2513,10 @@ color: var(--contrast-color);
     pointer-events: none;
     color: #ccc;
 }
+.blog-pagination li.disabled a {
+    pointer-events: none;
+    color: #ccc;
+}
 /*--------------------------------------------------------------
 # Blog Details Section
 --------------------------------------------------------------*/
@@ -2278,7 +2590,7 @@ color: var(--contrast-color);
 
 .blog-details .meta-top ul {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   list-style: none;
   align-items: center;
   padding: 0;
@@ -2302,6 +2614,60 @@ color: var(--contrast-color);
   display: inline-block;
   line-height: 1;
 }
+
+.forty {
+width: 40%;
+}
+
+.success {
+background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+}
+
+.success:hover {
+background-color: color-mix(in srgb, var(--accent-color), transparent 35%);
+}
+
+.search-widget .hide {
+display: none;
+visibility: hidden;
+}
+
+.search-widget #results {
+display: block;
+position: relative;
+overflow-y: auto;
+background: #EDEDED;
+border-radius: 5px;
+box-shadow: 0 5px 15px rgba(0,0,0,0.2);;
+z-index: 999;
+height: 50%;
+}
+
+.search-widget #results p{
+color: black;
+display: block;
+margin-block-start: 0em;
+margin-block-end: 1em;
+font-size: 1em;
+}
+
+.search-widget #results i{
+     float: right;
+     position: absolute;
+     top: 10px;
+     right: 10px;
+     background: none;
+     border: none;
+     font-size: 24px;
+     cursor: pointer;
+     color:black;
+     }
+
+.search-widget #results img{
+max-height: 100%;
+max-width: 80%;
+}
+
 
 .blog-details .meta-bottom {
   padding-top: 10px;
@@ -2357,7 +2723,36 @@ color: var(--contrast-color);
 .blog-details .meta-bottom .share i {
   padding-left: 5px;
 }
-
+#specAccordion {
+width: 100%;
+}
+.spec-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .spec-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .spec-list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .spec-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+        }
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+.spec-label {
+            font-weight: bold;
+        }
 /*--------------------------------------------------------------
 # Blog Comments Section
 --------------------------------------------------------------*/
@@ -2730,12 +3125,12 @@ color: var(--contrast-color);
 /* Chat Icon Styles */
 .chat-icon {
       position: fixed;
-      bottom: 60px;
-      right: 15px;
+      bottom: 80px;
+      right: 12px;
       width: 50px;
       height: 50px;
       z-index: 996;
-      background: #4285f4;
+      background: color-mix(in srgb, var(--accent-color), transparent 25%);
       border-radius: 50%;
       cursor: pointer;
       display: flex;
@@ -2766,7 +3161,7 @@ color: var(--contrast-color);
 
 .chat-header {
      padding: 15px;
-     background: #4285f4;
+     background: var(--accent-color);
      color: white;
      border-radius: 15px 15px 0 0;
      cursor: crosshair;
@@ -2806,6 +3201,7 @@ input[type="text"] {
      padding: 8px 12px;
      border-radius: 15px;
      max-width: 80%;
+     background: #f1f3f4;
      }
 
 .user-message {

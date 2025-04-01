@@ -9,8 +9,8 @@
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="/static/assets/img/favicon.png" rel="icon">
-  <link href="/static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="/static/assets/img/modern_mushroom.jpeg" rel="icon">
+  <link href="/static/assets/img/modern_mushroom.jpeg" rel="apple-touch-icon">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -43,35 +43,31 @@
 
       <a href="{{url_for('home')}}" class="logo d-flex align-items-center">
         <!-- Uncomment the line below if you also wish to use an image logo -->
-         <img src="/static/assets/img/logo.png" alt="">
+         <img src="/static/assets/img/modern_mushroom.jpeg" alt="">
         <h1 class="sitename"> <b>Mushroom Motors.</b></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="{{url_for('home')}}" class="active">Home</a></li>
-          <li><a href="{{url_for('about')}}">About</a></li>
-          <li><a href="{{url_for('blog')}}">Trucks</a></li>
-          <li><a href="{{url_for('blog')}}">Bikes</a></li>
 <!--          <li><a href="{{url_for('team')}}">Team</a></li>-->
           <li><a href="{{url_for('blog')}}">Vehicles</a></li>
-          <li class="dropdown"><a href="{{ url_for('blog_details', post_id=1) }}"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li><a href="{{url_for('services')}}">Services</a></li>
+          <li><a href="{{url_for('about')}}">About</a></li>
+            {% if current_user.is_admin %}
+          <li class="dropdown"><a href="#"><span>Admin</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
+                {% if current_user.email in admin_list %}
+              <li><a href="{{url_for('admin')}}">Admin Control Panel</a></li>
+                {% endif %}
+              <li><a href="{{url_for('edit_profile', index=current_user.id)}}">My Profile</a></li>
+              <li><a href="{{url_for('blog', selected_user=current_user.id)}}">My Posts</a></li>
+              <li><a href="{{url_for('upload')}}">Upload</a></li>
+              <li><a href="{{url_for('register')}}">Register</a></li>
+              <li><a href="{{url_for('logout')}}">Log Out</a></li>
             </ul>
           </li>
+            {% endif %}
           <li><a href="{{url_for('contact')}}">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -91,11 +87,11 @@
       <div class="container">
         <div class="row gy-4 d-flex">
           <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
-            <h2 data-aos="fade-up">Go Vroom Vroom... with Mushroom!</h2>
+            <h2 data-aos="fade-up">Go Vroom, Vroom... with Mushroom!</h2>
             <p data-aos="fade-up" data-aos-delay="100">Find your Perfect car. Finance your ticket to Comfort & Convenience.</p>
-            <p data-aos="fade-up" data-aos-delay="100">You order We deliver</p>
+            <a href="#filter"><p data-aos="fade-up" data-aos-delay="100"><em>Explore our vehicles</em></p></a>
 
-            <form action="#" class="form-search d-flex align-items-stretch mb-0" data-aos="fade-up" data-aos-delay="200" id="myForm" onsubmit="onFormSubmit(event)">
+            <form hx-get="/search" hx-swap="outerHTML"  hx-target="#results" class="form-search d-flex align-items-stretch mb-0" data-aos="fade-up" data-aos-delay="100" id="myForm" onsubmit="addEventOnInput()">
                       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
               <input type="text" class="form-control" id="myInput" placeholder="Search for Vehicle type" name="query" hx-get="/search" hx-swap="outerHTML" hx-trigger="keyup delay:500ms"  hx-target="#results" oninput="addEventOnInput()">
               <button type="submit" class="btn btn-primary">Search</button>
@@ -104,7 +100,7 @@
             <div class="p-2 hide bd-highlight" id="results">
             </div>
 
-            <div class="row gy-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="row gy-4" data-aos="fade-up" data-aos-delay="100">
 
               <div class="col-lg-3 col-6">
                 <div class="stats-item text-center w-100 h-100">
@@ -139,7 +135,7 @@
           </div>
 
           <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
-            <img src="/static/assets/img/hero-img.svg" class="img-fluid mb-3 mb-lg-0" alt="">
+            <img id="mushroom_svg" src="/static/assets/img/mushroom_00001.svg" class="img-fluid mb-3 mb-lg-0" alt="">
           </div>
 
         </div>
@@ -147,123 +143,493 @@
 
     </section><!-- /Hero Section -->
 
-    <section id="portfolio" class="portfolio section">
-
-      <div class="container">
-
-    <div class="stats-item text-center w-100 h-100 count-numbers" style="margin-bottom: 10%">
-<!--                  <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="0" class="purecounter">32</span>-->
-                  <h2>Search based on preference</h2>
-                <p>.</p>
+    <section id="filter">
+       <div class="container py-5">
+    <h1 class="text-center mb-4">Filter Cars</h1>
+    <!-- Filters Section -->
+    <div class="text-center mb-4">
+      <div class="filters">
+        <button onclick="filterItems('search')">Search by Parameters</button>
+        <button onclick="filterItems('brand')">Filter by Brand</button>
+        <button onclick="filterItems('vehicle')">Filter by Vehicle Type</button>
+      </div>
     </div>
-        <div class="isotope-layout" data-default-filter=".filter-app" data-layout="masonry" data-sort="original-order">
+       </div>
+      <div class="container py-5">
+    <div class="row row-cols-3 row-cols-sm-2 row-cols-xs-3 row-cols-md-4 row-cols-lg-6 g-4">
+      <!-- Example brand card -->
+      <div class="search-widget check" data-category="search">
+    <form id="searchForm" method="POST" action="/">
+        <input type="hidden" id="csrf" name="csrf_token" value="{{ csrf_token }}">
+        <div class="filter-section">
+            <input type="text" id="keyword" name="keyword" placeholder="Enter keyword" class="search-input">
+            <div class="row">
+            <div class="col-2 filter-group">
+                <label>Brand</label>
+                <select title="brand" name="brand" id="brand" class="filter-select" hx-post="{{url_for('options')}}" hx-trigger="change" hx-target="#model">
+                    <option value="all">All brands</option>
+                    {% for brand in brands %}
+                    <option value="{{ brand }}">{{ brand }}</option>
+                    {% endfor %}
+                </select>
+                <label>Model</label>
+                <select name="model" title="model" id="model" class="filter-select">
+                    <option value="all">All Models</option>
+                </select>
+                <label>Sort By:</label>
+                <select name="order" title="order" id="feature" class="filter-select">
+                    <option value="new model">Newest Model Year</option>
+                    <option value="old model">Oldest Model Year</option>
+                    <option value="mileage">Mileage</option>
+                    <option value="name ascending">Ascending model name</option>
+                    <option value="name descending">Descending model name</option>
+                </select>
+            </div>
 
-          <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
-<!--            <li data-filter=".filter-search"> Search </li>-->
-            <li data-filter=".filter-app" class="filter-active">Brand</li>
-            <li data-filter=".filter-product">Vehicle type</li>
-            <li data-filter=".filter-branding">Build</li>
-          </ul><!-- End Portfolio Filters -->
+            <div class="col-2 filter-group">
+                <label>Filter by Budget</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="price" value="0-500K">
+                        0-500K
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="500K-1M">
+                        500K-1M
+                    </label>
+                     <label>
+                        <input type="checkbox" name="price" value="1M-1.5M">
+                        1M-1.5M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="1.5M-2M">
+                        1.5M-2M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="2M-3M">
+                        2M-3M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="3M-5M">
+                        3M-5M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="5M-10M">
+                        5M-10M
+                    </label>
+                    <label>
+                        <input type="checkbox" name="price" value="Above 10M">
+                        Above 10M
+                    </label>
+                </div>
+            </div>
 
-          <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-2 filter-group">
+                <label>Availability</label>
+                <div class="toggle-buttons" id="filter-actions" onclick="chooseFilter(event)">
+                    <button type="button" class="toggle-btn active" data-value="all">All (294)</button>
+                    <button type="button" class="toggle-btn" data-value="local">Available in Kenya</button>
+                    <button type="button" class="toggle-btn" data-value="import">Direct Import/International stock</button>
+                </div>
+            </div>
 
-            <div class="col-lg-4 col-md-6 col-sm-6 col-6 portfolio-item  isotope-item filter-app" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{ url_for('blog')}}"><img src="/static/assets/img/filters/honda.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>App 1</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-1.jpg" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
+<!--            <div class="col-2 filter-group">-->
+<!--                <label>Sort By:</label>-->
+<!--                <select name="features" id="features" class="filter-select">-->
+<!--                    <option value="new model">Newest Model Year</option>-->
+<!--                    <option value="old model">Oldest Model Year</option>-->
+<!--                    <option value="mileage">Mileage</option>-->
+<!--                    <option value="name ascending">Ascending model name</option>-->
+<!--                    <option value="name descending">Descending model name</option>-->
+<!--                </select>-->
+<!--            </div>-->
 
-            <div class="col-lg-6 col-md-6 col-6 portfolio-item  isotope-item filter-product" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/sport-bike-motorcycle-icon.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>Product 1</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-2.jpg" title="Product 1" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-4 col-md-6 col-6 portfolio-item  isotope-item filter-branding" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/saloons.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>Branding 1</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-3.jpg" title="Branding 1" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-4 col-md-6 col-sm-6 col-6 portfolio-item  isotope-item filter-app" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/lexus.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>App 2</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/filters/lexus.svg" title="App 2" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-6 col-md-6 col-6 portfolio-item  isotope-item filter-product" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/long-truck-icon.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>Product 2</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-5.jpg" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-4 col-md-6 col-6 portfolio-item  isotope-item filter-branding" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/suvs.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>Branding 2</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-6.jpg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-4 col-md-6 col-sm-6 col-6 portfolio-item  isotope-item filter-app" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/mercedes.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>App 3</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-7.jpg" title="App 3" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-4 col-md-6 col-sm-6 col-6 portfolio-item  isotope-item filter-app" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/nissan.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>Product 3</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-8.jpg" title="Product 3" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-            <div class="col-lg-4 col-md-6 col-6 portfolio-item  isotope-item filter-branding" style="display: flex; justify-content: center; align-items: center;">
-              <a href="{{url_for('blog')}}"><img src="/static/assets/img/filters/hatchbacks.svg" class="img-fluid" alt=""></a>
-<!--              <div class="portfolio-info">-->
-<!--                <h4>Branding 3</h4>-->
-<!--                <p>Lorem ipsum, dolor sit</p>-->
-<!--                <a href="/static/assets/img/masonry-portfolio/masonry-portfolio-9.jpg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>-->
-<!--                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>-->
-<!--              </div>-->
-            </div><!-- End Portfolio Item -->
-
-          </div><!-- End Portfolio Container -->
-
+            <div class="col-2 filter-actions">
+                <button type="button" title="clear" onclick="clearFilters()" class="btn btn-primary clear-button">Clear all</button>
+                <button type="submit" title="search" class="btn btn-primary search-button">Search</button>
+            </div>
+            </div>
         </div>
-
+    </form>
+</div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='Toyota') }}">
+          <img src="static/assets/img/brands/toyota.svg" alt="Toyota Logo" class="brand-logo">
+            <div class="brand-name">Toyota</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='BMW') }}">
+          <img src="static/assets/img/brands/bmw.svg" alt="BMW Logo" class="brand-logo">
+            <div class="brand-name">BMW</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='audi') }}">
+          <img src="static/assets/img/brands/audi.svg" alt="Audi Logo" class="brand-logo">
+            <div class="brand-name">Audi</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='chevrolet') }}">
+          <img src="static/assets/img/brands/chevrolet.svg" alt="Chevrolet Logo" class="brand-logo">
+            <div class="brand-name">Chevrolet</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='mercedes') }}">
+          <img src="static/assets/img/filters/mercedes.svg" alt="Mercedes Logo" class="brand-logo">
+            <div class="brand-name">Mercedes-Benz</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='volkswagen') }}">
+          <img src="static/assets/img/brands/volkswagen.svg" alt="Volkswagen Logo" class="brand-logo">
+            <div class="brand-name">Volkswagen</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='porsche') }}">
+          <img src="static/assets/img/brands/porsche.svg" alt="porsche Logo" class="brand-logo">
+            <div class="brand-name">Porsche</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='lexus') }}">
+          <img src="static/assets/img/filters/lexus.svg" alt="Lexus Logo" class="brand-logo">
+            <div class="brand-name">Lexus</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='nissan') }}">
+          <img src="static/assets/img/filters/nissan.svg" alt="Nissan Logo" class="brand-logo">
+            <div class="brand-name">Nissan</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='honda') }}">
+          <img src="static/assets/img/brands/honda.svg" alt="honda Logo" class="brand-logo">
+            <div class="brand-name">Honda</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='hyundai') }}">
+          <img src="static/assets/img/brands/hyundai.svg" alt="hyundai Logo" class="brand-logo">
+            <div class="brand-name">Hyundai</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='isuzu') }}">
+          <img src="static/assets/img/brands/isuzu.svg" alt="isuzu Logo" class="brand-logo">
+            <div class="brand-name">Isuzu</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='daihatsu') }}">
+          <img src="static/assets/img/brands/daihatsu.svg" alt="daihatsu Logo" class="brand-logo">
+            <div class="brand-name">Daihatsu</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='ford') }}">
+          <img src="static/assets/img/brands/ford.svg" alt="Ford Logo" class="brand-logo">
+            <div class="brand-name">Ford</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='fiat') }}">
+          <img src="static/assets/img/brands/fiat.svg" alt="fiat Logo" class="brand-logo">
+            <div class="brand-name">Fiat</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='subaru') }}">
+          <img src="static/assets/img/brands/subaru.svg" alt="subaru Logo" class="brand-logo">
+            <div class="brand-name">Subaru</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='mazda') }}">
+          <img src="static/assets/img/brands/mazda.svg" alt="mazda Logo" class="brand-logo">
+            <div class="brand-name">Mazda</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='mitsubishi') }}">
+          <img src="static/assets/img/brands/mitsubishi.svg" alt="mitsubishi Logo" class="brand-logo">
+            <div class="brand-name">Mitsubishi</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='kia') }}">
+          <img src="static/assets/img/brands/kia.svg" alt="kia Logo" class="brand-logo">
+            <div class="brand-name">Kia</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='Land Rover') }}">
+          <img src="static/assets/img/brands/land.svg" alt="land rover Logo" class="brand-logo">
+            <div class="brand-name">Land Rover</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='peugeot') }}">
+          <img src="static/assets/img/brands/peugeot.svg" alt="peugeot Logo" class="brand-logo">
+            <div class="brand-name">Peugeot</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='jeep') }}">
+          <img src="static/assets/img/brands/jeep.svg" alt="jeep Logo" class="brand-logo">
+            <div class="brand-name">Jeep</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='jaguar') }}">
+          <img src="static/assets/img/brands/jaguar.svg" alt="jaguar Logo" class="brand-logo">
+            <div class="brand-name">Jaguar</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='renault') }}">
+          <img src="static/assets/img/brands/renault.svg" alt="renault Logo" class="brand-logo">
+            <div class="brand-name">Renault</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='suzuki') }}">
+          <img src="static/assets/img/brands/suzuki.svg" alt="suzuki Logo" class="brand-logo">
+            <div class="brand-name">Suzuki</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='volvo') }}">
+          <img src="static/assets/img/brands/volvo.svg" alt="Volvo Logo" class="brand-logo">
+            <div class="brand-name">Volvo</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='byd') }}">
+          <img src="static/assets/img/brands/byd.svg" alt="byd Logo" class="brand-logo">
+            <div class="brand-name">BYD</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='chrysler') }}">
+          <img src="static/assets/img/brands/chrysler.svg" alt="chrysler Logo" class="brand-logo">
+            <div class="brand-name">Chrystler</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='citroen') }}">
+          <img src="static/assets/img/brands/citroen.svg" alt="citroen Logo" class="brand-logo">
+            <div class="brand-name">Citroen</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='ferrari') }}">
+          <img src="static/assets/img/brands/ferrari.svg" alt="ferrari Logo" class="brand-logo">
+            <div class="brand-name">Ferrari</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='lamborghini') }}">
+          <img src="static/assets/img/brands/lamborghini.svg" alt="lamborghini Logo" class="brand-logo">
+            <div class="brand-name">Lamborghini</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='maserati') }}">
+          <img src="static/assets/img/brands/maserati.svg" alt="maserati Logo" class="brand-logo">
+            <div class="brand-name">maserati</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='mclaren') }}">
+          <img src="static/assets/img/brands/mclaren.svg" alt="mclaren Logo" class="brand-logo">
+            <div class="brand-name">Mclaren</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='Rolls-Royce') }}">
+          <img src="static/assets/img/brands/rolls.svg" alt="Rolls-Royce Logo" class="brand-logo">
+            <div class="brand-name">Rolls-Royce</div></a>
+        </div>
       </div>
 
-    </section><!-- /Portfolio Section -->
+
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='bentley') }}">
+          <img src="static/assets/img/brands/bentley.svg" alt="Bentley Logo" class="brand-logo">
+            <div class="brand-name">Bentley</div></a>
+        </div>
+      </div>      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='Alfa Romeo') }}">
+          <img src="static/assets/img/brands/alfa.svg" alt="Alfa Romeo Logo" class="brand-logo">
+            <div class="brand-name">Alfa Romeo</div></a>
+        </div>
+      </div>
+      <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='aston martin') }}">
+          <img src="static/assets/img/brands/aston.svg" alt="Aston Martin Logo" class="brand-logo">
+            <div class="brand-name">Aston Martin</div></a>
+        </div>
+      </div>
+       <div class="col check hidden" data-category="brand">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_brand='tesla') }}">
+          <img src="static/assets/img/brands/tesla.svg" alt="tesla logo" class="brand-logo">
+            <div class="brand-name">Tesla</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='coupe') }}">
+          <img src="static/assets/img/brands/coupe-car-svgrepo-com.svg" alt="coupe" class="brand-logo">
+            <div class="brand-name">Coupe</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='convertible') }}">
+          <img src="static/assets/img/brands/Convertible.png" alt="Convertible" class="brand-logo">
+            <div class="brand-name">Convertible</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='minivan') }}">
+          <img src="static/assets/img/brands/minivan-svgrepo-com.svg" alt="Minivan" class="brand-logo">
+            <div class="brand-name">Minivan</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='sports-car') }}">
+          <img src="static/assets/img/brands/sports-car.svg" alt="Sports car" class="brand-logo">
+            <div class="brand-name">Sports car</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='hatchback') }}">
+          <img src="static/assets/img/filters/hatchbacks.svg" alt="Hatchback" class="brand-logo">
+            <div class="brand-name">Hatchback</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='truck') }}">
+          <img src="static/assets/img/filters/long-truck-icon.svg" alt="Truck" class="brand-logo">
+            <div class="brand-name">Truck</div></a>
+        </div>
+      </div>
+        <div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='saloon') }}">
+          <img src="static/assets/img/filters/saloons.svg" alt="Saloon" class="brand-logo">
+            <div class="brand-name">Saloon</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='bike') }}">
+          <img src="static/assets/img/filters/sport-bike-motorcycle-icon.svg" alt="Bike" class="brand-logo">
+            <div class="brand-name">Bikes</div></a>
+        </div>
+      </div><div class="col check hidden" data-category="vehicle">
+        <div class="brand-card">
+          <a href="{{ url_for('blog', selected_type='suv') }}">
+          <img src="static/assets/img/filters/suvs.svg" alt="SUV" class="brand-logo">
+            <div class="brand-name">SUV</div></a>
+        </div>
+      </div>
+      <!-- Repeat for all 84 brands -->
+    </div>
+  </div>
+    </section>
+
+    <!-- Blog Posts Section -->
+    <section id="blog-posts" class="blog-posts section">
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h1 class="text-center mb-4">Recent arrivals</h1>
+          <br>
+        <a href="{{url_for('blog')}}"> See all vehicles <i class="bi bi-arrow-up-right"></i> </a>
+      </div><!-- End Section Title -->
+      <div class="container">
+
+        <div class="row gy-5">
+    {% for page in pages %}
+    <div id="vehicle-{{ page.id }}" class="col-lg-4 col-md-6 mt-5">
+        <div class="card card-standard">
+            <a href="{{ url_for('blog_details', post_id=page.id) }}">
+                {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
+                <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image">
+            </a>
+
+            {% if page.sold %}
+            <span class="badge sold">Sold</span>
+            {% elif page.reserved %}
+            <span class="badge reserved">Reserved</span>
+            {% else %}
+            <span class="badge availability">Available</span>
+            {% endif %}
+            {% if current_user.is_admin %}
+            <div class="edit-deleteone">
+                <a href="{{ url_for('edit', index=page.id) }}" class="details-link">
+                    <span class="edit-deletetwo">edit <i class="bi bi-link-45deg"></i></span>
+                </a>
+                <button
+                  class="btn btn-danger btn-sm"
+                  hx-get="{{ url_for('pre_delete', index=page.id)}}"
+                  hx-target="#delete-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#delete-modal"
+                  data-url="{{ url_for('pre_delete', index=page.id)}}">
+                  Delete
+                </button>
+<!--                <a href="{{ url_for('pre_delete', index=page.id)}}" class="details-link"><span class="edit-deletetwo">delete <i class="bi bi-x-circle-fill"></i> </span></a>-->
+
+            </div>
+            {% endif %}
+
+            <div class="card-body card-body-standard">
+                <h5 class="card-title">
+                    <span class="badge bg-dark mb-4">{{ page.model_year }}</span>
+                    <b>{{ page.brand.capitalize() }} {{ page.title.capitalize() }}</b>
+                </h5>
+                <div class="mb-3">
+                    <span class="badge bg-secondary">{{ page.transmission }}</span>
+                    <span class="badge bg-secondary">{{ page.engine_rating }}</span>
+                    <span class="badge bg-secondary">{{page.condition or 'N/A'}}</span>
+                </div>
+                <p class="card-text" >
+                    {{page.description or 'insert description here'}}
+                </p>
+            </div>
+            <div class="card-footer">
+                <h6 class="card-subtitle mb-2 text-muted">Price: KES {{ page.price | number_format }}</h6>
+                <a href="{{ url_for('blog_details', post_id=page.id) }}" class="btn md_contact">Contact Seller</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+      </div>
+    </section><!-- /Blog Posts Section -->
 
 
 <!--    &lt;!&ndash; About Section &ndash;&gt;-->
@@ -271,7 +637,7 @@
 
 <!--      <div class="container">-->
 <!--        <div class="row align-items-center justify-content-between">-->
-<!--          <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2" data-aos="fade-up" data-aos-delay="400">-->
+<!--          <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2" data-aos="fade-up" data-aos-delay="100">-->
 <!--            <div class="swiper init-swiper">-->
 <!--              <script type="application/json" class="swiper-config">-->
 <!--                {-->
@@ -315,23 +681,21 @@
 <!--          <div class="col-lg-4 order-lg-1">-->
 <!--            <span class="section-subtitle" data-aos="fade-up">Welcome</span>-->
 <!--            <h1 class="mb-4" data-aos="fade-up">-->
-<!--              Excepteur sint occaecat cupidatat non proident-->
+<!--              Our Services:-->
 <!--            </h1>-->
 <!--            <p data-aos="fade-up">-->
-<!--              Far far away, behind the word mountains, far from the countries-->
-<!--              Vokalia and Consonantia, there live the blind texts. Separated they-->
-<!--              live in Bookmarksgrove right at the coast of the Semantics, a large-->
-<!--              language ocean.-->
+<!--              From the best deals on the latest wheels, to vehicle trade-in and auto services.-->
+<!--              We cater for all your car needs, from a sporty Benz down to a simple oil change.-->
 <!--            </p>-->
 <!--            <p class="mt-5" data-aos="fade-up">-->
-<!--              <a href="#" class="btn btn-get-started">Get Started</a>-->
+<!--              <a href="url_for('contact')" class="btn btn-get-started">Get Started</a>-->
 <!--            </p>-->
 <!--          </div>-->
 <!--        </div>-->
 <!--      </div>-->
 <!--    </section>&lt;!&ndash; /About Section &ndash;&gt;-->
 
-<!--    &lt;!&ndash; About 2 Section &ndash;&gt;-->
+    <!-- About 2 Section -->
 <!--    <section id="about-2" class="about-2 section light-background">-->
 
 <!--      <div class="container">-->
@@ -401,7 +765,7 @@
           </div>
 
           <div class="col-lg-3">
-            <div class="services-item" data-aos="fade-up" data-aos-delay="200">
+            <div class="services-item" data-aos="fade-up" data-aos-delay="100">
               <div class="services-icon">
                 <i class="bi bi-bullseye"></i>
               </div>
@@ -444,14 +808,14 @@
               <!-- Start Stats Item -->
               <div class="col-4 counter" data-aos="fade-up" data-aos-delay="100">
                 <span data-purecounter-separator="true" data-purecounter-start="0" data-purecounter-end="391" data-purecounter-duration="1" class="purecounter number"></span>
-                <span class="d-block">Used Cars</span>
+                <span class="d-block">New Imports</span>
               </div>
               <!-- End Stats Item -->
 
               <!-- Start Stats Item -->
               <div class="col-4 counter" data-aos="fade-up" data-aos-delay="200">
                 <span data-purecounter-separator="true" data-purecounter-start="0" data-purecounter-end="28" data-purecounter-duration="1" class="purecounter number"></span>
-                <span class="d-block">New Imports</span>
+                <span class="d-block">Bikes</span>
               </div>
               <!-- End Stats Item -->
 
@@ -469,83 +833,6 @@
 
       </div>
     </section><!-- /Stats Section -->
-
-    <!-- Blog Posts Section -->
-    <section id="blog-posts" class="blog-posts section">
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <p>Used Vehicles</p>
-        <h2>Recent arrivals</h2>
-      </div><!-- End Section Title -->
-      <div class="container">
-
-        <div class="row gy-4">
-          <div class="col-md-6 col-lg-4">
-            <div class="post-entry" data-aos="fade-up" data-aos-delay="100">
-              <a href="{{ url_for('blog_details', post_id=3) }}" class="thumb d-block"><img src="/static/assets/cars/nissanxtrail/front.jpeg" alt="Image" class="img-fluid rounded"></a>
-
-              <div class="post-content">
-                <div class="meta">
-                  <a href="#" class="cat">Nissan Xtrail</a> •
-                  <span class="date">Model year: 2017</span>
-                </div>
-                <h3><a href="#">Nissan</a></h3>
-                <p>
-                  Automatic transmission, AWD
-                </p>
-
-<!--                <div class="d-flex author align-items-center">-->
-<!--                  <div class="pic">-->
-<!--                    <img src="/static/assets/cars/lexus/interior.jpeg" alt="Image" class="img-fluid rounded-circle">-->
-<!--                  </div>-->
-<!--                  <div class="author-name">-->
-<!--                    <strong class="d-block">Winston Gold</strong>-->
-<!--                    <span class="">Lead Product Designer</span>-->
-<!--                  </div>-->
-<!--                </div>-->
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="post-entry" data-aos="fade-up" data-aos-delay="200">
-              <a href="{{ url_for('blog_details', post_id=1) }}" class="thumb d-block"><img src="/static/assets/cars/lexus/front.jpeg" alt="Image" class="img-fluid rounded"></a>
-
-              <div class="post-content">
-                <div class="meta">
-                  <a href="#" class="cat">Lexus</a> •
-                  <span class="date">Model year: 2017</span>
-                </div>
-                <h3><a href="#">Lexus SUV</a></h3>
-                <p>
-                  Diesel Engine
-                  Automatic transmission
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="post-entry" data-aos="fade-up" data-aos-delay="300">
-              <a href="{{ url_for('blog_details', post_id=3) }}" class="thumb d-block"><img src="/static/assets/cars/honda/front.jpeg" alt="Image" class="img-fluid rounded"></a>
-
-              <div class="post-content">
-                <div class="meta">
-                  <a href="#" class="cat">Honda</a> •
-                  <span class="date">Model Year: 2017</span>
-                </div>
-                <h3><a href="#">Honda Civic</a></h3>
-                <p>
-                  Hybrid Car.
-                  AWD.
-                  Automatic transmission.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section><!-- /Blog Posts Section -->
 
 <!--    &lt;!&ndash; Tabs Section &ndash;&gt;-->
 <!--    <section id="tabs" class="tabs section light-background">-->
@@ -760,230 +1047,102 @@
 <!--    </section>&lt;!&ndash; /Faq Section &ndash;&gt;-->
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials section">
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <p>Happy Customers</p>
-        <h2>Testimonials (This is to be replaced by Trustpilot reviews)</h2>
-      </div><!-- End Section Title -->
+<!--    <section id="testimonials" class="testimonials section">-->
+<!--      &lt;!&ndash; Section Title &ndash;&gt;-->
+<!--      <div class="container section-title" data-aos="fade-up">-->
+<!--        <p>Happy Customers</p>-->
+<!--        <h2>Testimonials (This is to be replaced by Trustpilot reviews)</h2>-->
+<!--      </div>&lt;!&ndash; End Section Title &ndash;&gt;-->
 
-      <div class="container" data-aos="fade-up">
-        <div class="row justify-content-center">
-          <div class="col-lg-7">
-            <div class="swiper init-swiper">
-              <script type="application/json" class="swiper-config">
-                {
-                  "loop": true,
-                  "speed": 600,
-                  "autoplay": {
-                    "delay": 5000
-                  },
-                  "slidesPerView": "auto",
-                  "pagination": {
-                    "el": ".swiper-pagination",
-                    "type": "bullets",
-                    "clickable": true
-                  },
-                  "breakpoints": {
-                    "320": {
-                      "slidesPerView": 1,
-                      "spaceBetween": 40
-                    },
-                    "1200": {
-                      "slidesPerView": 1,
-                      "spaceBetween": 1
-                    }
-                  }
-                }
-              </script>
-              <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                  <div class="testimonial mx-auto">
-                    <figure class="img-wrap">
-                      <img src="/static/assets/img/incognito.png" alt="Image" class="img-fluid">
-                    </figure>
-                    <h3 class="name">Victor</h3>
-                    <blockquote>
-                      <p>
-                        “There live the blind texts. Separated they live in
-                        Bookmarksgrove right at the coast of the Semantics, a large
-                        language ocean.”
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="testimonial mx-auto">
-                    <figure class="img-wrap">
-                      <img src="/static/assets/img/incognito.png" alt="Image" class="img-fluid">
-                    </figure>
-                    <h3 class="name">Shawn</h3>
-                    <blockquote>
-                      <p>
-                        “There live the blind texts. Separated they live in
-                        Bookmarksgrove right at the coast of the Semantics, a large
-                        language ocean.”
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="testimonial mx-auto">
+<!--      <div class="container" data-aos="fade-up">-->
+<!--        <div class="row justify-content-center">-->
+<!--          <div class="col-lg-7">-->
+<!--            <div class="swiper init-swiper">-->
+<!--              <script type="application/json" class="swiper-config">-->
+<!--                {-->
+<!--                  "loop": true,-->
+<!--                  "speed": 600,-->
+<!--                  "autoplay": {-->
+<!--                    "delay": 5000-->
+<!--                  },-->
+<!--                  "slidesPerView": "auto",-->
+<!--                  "pagination": {-->
+<!--                    "el": ".swiper-pagination",-->
+<!--                    "type": "bullets",-->
+<!--                    "clickable": true-->
+<!--                  },-->
+<!--                  "breakpoints": {-->
+<!--                    "320": {-->
+<!--                      "slidesPerView": 1,-->
+<!--                      "spaceBetween": 40-->
+<!--                    },-->
+<!--                    "1200": {-->
+<!--                      "slidesPerView": 1,-->
+<!--                      "spaceBetween": 1-->
+<!--                    }-->
+<!--                  }-->
+<!--                }-->
+<!--              </script>-->
+<!--              <div class="swiper-wrapper">-->
+<!--                <div class="swiper-slide">-->
+<!--                  <div class="testimonial mx-auto">-->
 <!--                    <figure class="img-wrap">-->
 <!--                      <img src="/static/assets/img/incognito.png" alt="Image" class="img-fluid">-->
 <!--                    </figure>-->
-                    <h3 class="name">Chad</h3>
-                    <blockquote>
-                      <p>
-                        “There live the blind texts. Separated they live in
-                        Bookmarksgrove right at the coast of the Semantics, a large
-                        language ocean.”
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-              </div>
-              <div class="swiper-pagination"></div>
-            </div>
-          </div>
+<!--                    <h3 class="name">Victor</h3>-->
+<!--                    <blockquote>-->
+<!--                      <p>-->
+<!--                        “There live the blind texts. Separated they live in-->
+<!--                        Bookmarksgrove right at the coast of the Semantics, a large-->
+<!--                        language ocean.”-->
+<!--                      </p>-->
+<!--                    </blockquote>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="swiper-slide">-->
+<!--                  <div class="testimonial mx-auto">-->
+<!--                    <figure class="img-wrap">-->
+<!--                      <img src="/static/assets/img/incognito.png" alt="Image" class="img-fluid">-->
+<!--                    </figure>-->
+<!--                    <h3 class="name">Shawn</h3>-->
+<!--                    <blockquote>-->
+<!--                      <p>-->
+<!--                        “There live the blind texts. Separated they live in-->
+<!--                        Bookmarksgrove right at the coast of the Semantics, a large-->
+<!--                        language ocean.”-->
+<!--                      </p>-->
+<!--                    </blockquote>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="swiper-slide">-->
+<!--                  <div class="testimonial mx-auto">-->
+<!--&lt;!&ndash;                    <figure class="img-wrap">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <img src="/static/assets/img/incognito.png" alt="Image" class="img-fluid">&ndash;&gt;-->
+<!--&lt;!&ndash;                    </figure>&ndash;&gt;-->
+<!--                    <h3 class="name">Chad</h3>-->
+<!--                    <blockquote>-->
+<!--                      <p>-->
+<!--                        “There live the blind texts. Separated they live in-->
+<!--                        Bookmarksgrove right at the coast of the Semantics, a large-->
+<!--                        language ocean.”-->
+<!--                      </p>-->
+<!--                    </blockquote>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="swiper-pagination"></div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </section>&lt;!&ndash; /Testimonials Section &ndash;&gt;-->
+      <div id="delete-modal" class="modal modal-blur fade" tabindex="-1" style="display: none">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- HTMX will load the confirmation content here -->
         </div>
       </div>
-    </section><!-- /Testimonials Section -->
+      </div>
   </main>
 
-  <footer id="footer" class="footer light-background">
-    <div class="container">
-      <div class="row g-4">
-        <div class="col-md-6 col-lg-3 mb-3 mb-md-0">
-          <div class="widget">
-            <h3 class="widget-heading">About Us</h3>
-            <p class="mb-4">
-              We are a car dealership along Kiambu road.
-            </p>
-            <p class="mb-0">
-              <a href="#" class="btn-learn-more">Learn more</a>
-            </p>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 ps-lg-5 mb-3 mb-md-0">
-          <div class="widget">
-            <h3 class="widget-heading">Navigation</h3>
-            <ul class="list-unstyled float-start me-5">
-              <li><a href="#">Overview</a></li>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Find Buyers</a></li>
-            </ul>
-            <ul class="list-unstyled float-start">
-              <li><a href="#">Overview</a></li>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Services</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 pl-lg-5">
-          <div class="widget">
-            <h3 class="widget-heading">Recent Arrivals</h3>
-            <ul class="list-unstyled footer-blog-entry">
-              <li>
-                <span class="d-block date">May 3, 2020</span>
-                <a href="#">Honda</a>
-              </li>
-              <li>
-                <span class="d-block date">May 3, 2020</span>
-                <a href="#">Nissan</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 pl-lg-5">
-          <div class="widget">
-            <h3 class="widget-heading">Connect</h3>
-            <ul class="list-unstyled social-icons light mb-3">
-              <li>
-                <a href="#"><span class="bi bi-facebook"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="bi bi-twitter-x"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="bi bi-linkedin"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="bi bi-google"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="bi bi-google-play"></span></a>
-              </li>
-            </ul>
-          </div>
-
-          <div class="widget">
-            <div class="footer-subscribe">
-              <h3 class="widget-heading">Subscribe</h3>
-              <form action="forms/newsletter.php" method="post" class="php-email-form">
-                <div class="mb-2">
-                  <input type="text" class="form-control" name="email" placeholder="Enter your email">
-
-                  <button type="submit" class="btn btn-link">
-                    <span class="bi bi-arrow-right"></span>
-                  </button>
-                </div>
-                <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">
-                  Your subscription request has been sent. Thank you!
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="copyright d-flex flex-column flex-md-row align-items-center justify-content-md-between">
-        <p>© <span>Copyright</span> <strong class="px-1 sitename">Active.</strong> <span>All Rights Reserved</span></p>
-        <div class="credits">
-          <!-- All the links in the footer should remain intact. -->
-          <!-- You can delete the links only if you've purchased the pro version. -->
-          <!-- Licensing information: https://bootstrapmade.com/license/ -->
-          <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-          Designed by <a href="#">Victor</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <div class="chat-icon" onclick="toggleChat()"><i class="bi bi-chat-quote"></i></div>
-    <div class="chat-container" style="top: var(--top); left: var(--left)" id="chatContainer">
-        <div class="chat-header" id="chat-header-two">
-            <h3>AI Assistant</h3>
-            <i class="bi bi-x" onclick="toggleChat()"></i>
-        </div>
-        <div class="chat-history" id="chatHistory"></div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Type your message..."
-                   onkeypress="handleKeyPress(event)">
-        </div>
-    </div>
-
-  <!-- Preloader -->
-  <div id="preloader"></div>
-
-  <!-- Vendor JS Files -->
-  <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/assets/vendor/php-email-form/validate.js"></script>
-  <script src="/static/assets/vendor/aos/aos.js"></script>
-  <script src="/static/assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="/static/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="/static/assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="/static/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
-  <script src="/static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-
-  <!-- Main JS File -->
-  <script src="/static/assets/js/main.js"></script>
-  <script src="/static/assets/js/htmx.js"></script>
-  <script src="/static/assets/js/search.js"></script>
-</body>
-
-</html>
+  {% include 'footer.html' %}

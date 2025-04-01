@@ -1,0 +1,96 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% include 'header.html' %}
+   <style>
+    .dropzone {
+        border: 2px dashed #0087F7;
+        margin: 10%;
+        min-height: 400px;
+        color:  #0087F7;
+    }
+    #fike {border: 2px dashed #0087F7;
+        margin: 10%;
+        min-height: 100px;
+        color:  #0087F7;}
+    /* Add margin between form elements */
+    .custom-form {
+        margin-bottom: 15px; /* Adjust as needed */
+    }
+
+    /* Inline forms adjustment */
+    .form-control, #brand, #rating, #model {
+        margin-right: 10px;
+        border: 2px solid black;
+        margin-bottom: 15px;
+
+    }
+
+    /* Button styling */
+    .custom-form .btn-primary {
+        margin-top: 10px;
+    }
+  </style>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title light-background">
+      <div class="container">
+        <h1>My Profile</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{{url_for('home')}}">Home</a></li>
+            <li class="current">Profile</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Portfolio Details Section -->
+    <section id="portfolio-details" class="portfolio-details section">
+    <div class="container d-flex align-items-center" data-aos="fade-up">
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <p class="notification is-danger" style="color:red">
+            {{ messages[0] }}.
+        </p>
+        {% endif %}
+        {% endwith %}
+
+      </div>
+    <div class="container" data-aos="fade-up">
+      <div class="row justify-content-between gy-4 mt-4">
+          <div class="col-lg-8" data-aos="fade-up">
+            <h2>Edit My Profile</h2>
+              <p>Stay Upto date.</p>
+        <form method="POST" action="/edit-profile/{{user.id}}" enctype="multipart/form-data">
+                  {{ form.hidden_tag() }}
+            {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}
+        </form>
+
+        </div>
+      <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="portfolio-info">
+              <h3>Profile Info & Stats:</h3>
+              <ul>
+                  <li><strong>Name:</strong> {{user.name}}</li>
+                  <li><strong>Email:</strong> {{user.email}}</li>
+                  <li><strong>Phone:</strong> {{user.phone}}</li>
+                  <li><strong>Posts Created:</strong> {{user.posts_made or 0}}</li>
+                  <li><strong>Posts Edited:</strong> {{user.edits or 0}}</li>
+                  <li><strong>Posts Deleted:</strong> {{user.deletions or 0}}</li>
+                <li><a href="{{url_for('forgot')}}" class="btn-visit align-self-start">Change Password</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        </div>
+
+
+    </section><!-- /Portfolio Details Section -->
+
+  </main>
+
+
+  {% include 'footer.html' %}
