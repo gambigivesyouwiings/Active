@@ -89,7 +89,7 @@ class RegisterForm(FlaskForm):
     phone_number = StringField('Phone Number: This is how clients will reach you', id="model", validators=[
         DataRequired(),
         Regexp(r'^\+\d{1,15}$', message="Invalid phone number format")
-    ])
+    ], render_kw={"placeholder": "Format: +254123456789"})
     submit = SubmitField("Sign me Up")
 
 
@@ -183,7 +183,7 @@ class EditForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     name = StringField("Enter your name", id="brand", validators=[DataRequired()])
-    phone_number = StringField('Phone Number: This is how clients will reach you', id="model", validators=[
+    phone_number = StringField('Phone Number: This is how clients will reach you. N/B: Format - +254123456789', id="model", validators=[
         DataRequired(),
         Regexp(r'^\+\d{1,15}$', message="Invalid phone number format")
     ])

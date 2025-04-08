@@ -18,7 +18,7 @@
 }
 
 /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
-:root { 
+:root {
   --background-color: #ffffff; /* Background color for the entire website, including individual sections */
   --default-color: #212529; /* Default color used for the majority of the text content across the entire website */
   --heading-color: #2d465e; /* Color for headings, subheadings and title throughout the website */
@@ -2029,8 +2029,25 @@ visibility: hidden;
 }
 
 .team .swiper-wrapper {
-  height: auto;
+  height: 500px;
 }
+
+.card-team-img-top {
+     width: auto;
+     margin: auto;
+     height: 500px; /* Ensures the image scales proportionally */
+     object-fit: contain; /* Crop the image while keeping its proportions */
+    object-position: center;
+}
+
+.swiper-slide {
+    display: flex; /* Flexbox to handle image alignment */
+    justify-content: center; /* Center the image horizontally */
+    align-items: center; /* Center the image vertically */
+    height: 100%; /* Match the height of the swiper-wrapper */
+    overflow: hidden; /* Ensure no overflow */
+}
+
 
 .team .slider-nav a {
   width: 40px;
@@ -3151,7 +3168,7 @@ width: 100%;
      right: 20px;
      z-index: 996;
      width: 35%;
-     height: 50%;
+     height: 40%;
      background: white;
      border-radius: 15px;
      box-shadow: 0 5px 15px rgba(0,0,0,0.2);

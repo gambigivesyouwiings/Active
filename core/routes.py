@@ -52,7 +52,7 @@ def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fu
 
 image_file_types = ['.webp', '.svg', '.png', '.avif', '.jpg', '.jpeg', '.jfif', '.jpe', '.pjp', '.gif', '.apn']
 
-admin_list = ["gambikimathi@students.uonbi.ac.ke", "chadkirubi@gmail.com", "njengashwn@gmail.com"]
+admin_list = ["balywonder@gmail.com", "pgigz23@gmail.com", "gambikimathi@students.uonbi.ac.ke", "chadkirubi@gmail.com", "njengashwn@gmail.com"]
 
 
 @login_manager.user_loader
@@ -70,7 +70,9 @@ def csrf_error(e):
 def admin_only(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if current_user.email not in admin_list or not current_user.is_admin:
+        if current_user.email in admin_list:
+            return f(*args, **kwargs)
+        elif not current_user.is_admin:
             abort(403)
         return f(*args, **kwargs)
 
@@ -210,15 +212,6 @@ def about():
     return render_template("about.html")
 
 
-@app.route('/vehicles', methods=['OPTIONS'])
-def handle_options():
-    response = make_response()
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    return response
-
-
 @app.route("/vehicles", methods=["GET", "POST"])
 def blog():
     unique_brands = db.session.query(Catalogue.brand).distinct().all()
@@ -341,7 +334,7 @@ def get_quote():
     return render_template("get-a-quote.html")
 
 
-@app.route("/blog_details/<int:post_id>")
+@app.route("/vehicle_details/<int:post_id>")
 def blog_details(post_id):
     try:
         post = db.session.query(Catalogue).filter_by(id=post_id).first()
@@ -366,15 +359,17 @@ def blog_details(post_id):
         x.split(":")[0].strip(): x.split(":")[1].strip()
         for x in re.split(r"[,;]", post.extras) if ":" in x
     }
-    if post.user_id:
-        user = db.session.query(Users).filter_by(id=post.user_id).first()
-        if user:
-            phone_number = user.phone
-        else:
-            phone_number = "+254732252382"
+    # if post.user_id:
+    #     user = db.session.query(Users).filter_by(id=post.user_id).first()
+    #     if user:
+    #         phone_number = user.phone
+    #     else:
+    #         phone_number = "+254732252382"
 
-    else:
-        phone_number = "+254732252382"
+    # else:
+    #     phone_number = "+254732252382"
+
+    phone_number = "+254732252382"
 
     return render_template("blog-details.html", phone_number=phone_number, specs=spects, features=feature,
                            images=images, post=post, price=price, csrf_token=generate_csrf())
@@ -414,7 +409,7 @@ def pre_delete(index):
     vehicle = Catalogue.query.get_or_404(index)
     if not current_user.is_admin:
         abort(403)  # Restrict to admins
-    return render_template('confirm_delete_vehicle.html', vehicle=vehicle)
+    return render_template('confirm_delete_vehicle.html', csrf=generate_csrf(), vehicle=vehicle)
 
 
 @app.route("/delete/<int:post_id>", methods=["DELETE"])
@@ -440,7 +435,6 @@ def delete_vehicle(post_id):
 
 
 @app.route('/upload', methods=['GET', 'POST'])
-@login_required
 @admin_only
 def upload():
     form = CreatePostForm()
@@ -572,7 +566,6 @@ def upload2():
 
 
 @app.route("/edit-profile/<int:index>", methods=["GET", "POST"])
-@login_required
 @admin_only
 def edit_profile(index):
     form = EditProfileForm()
@@ -596,7 +589,6 @@ def edit_profile(index):
 
 # This route is for editing a blog post thumbnail, title etc.
 @app.route("/edit-post/<int:index>", methods=["GET", "POST"])
-@login_required
 @admin_only
 def edit(index):
     form = EditForm()
@@ -777,7 +769,7 @@ def confirm_delete_user(user_id):
     user = Users.query.get_or_404(user_id)
     if not current_user.is_admin:
         abort(403)  # Restrict to admins
-    return render_template('confirm_delete_user.html', user=user)
+    return render_template('confirm_delete_user.html', csrf=generate_csrf(), user=user)
 
 
 @app.route('/delete-user/<int:user_id>', methods=['DELETE'])

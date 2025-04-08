@@ -5,7 +5,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    SECRET_KEY = "guess-me"
+    SECRET_KEY = os.getenv("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = "sqlite:///content.db"
     SQLALCHEMY_ENGINE_OPTIONS = {'pool_recycle': 280}
     SQLALCHEMY_TRACK_MODIFICATIONS = False

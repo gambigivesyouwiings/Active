@@ -14,7 +14,7 @@ from flask_wtf.csrf import CSRFProtect
 app = Flask(__name__)
 
 # Load configuration from DevelopmentConfig
-app.config.from_object(DevelopmentConfig)
+app.config.from_object(ProductionConfig)
 
 # Initialize SQLAlchemy with the app instance
 db = SQLAlchemy(app)

@@ -13,6 +13,9 @@
         class="btn btn-danger"
         hx-delete="{{ url_for('delete_vehicle', post_id=vehicle.id) }}"
         hx-target="#vehicle-{{ vehicle.id }}"
+        hx-headers='{
+        "X-CSRFToken": "{{ csrf }}"
+        }'
         hx-swap="outerHTML"
         data-bs-dismiss="modal"
         >

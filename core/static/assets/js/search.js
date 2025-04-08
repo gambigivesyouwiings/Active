@@ -36,11 +36,27 @@ async function sendMessage() {
                 addMessageToHistory('Sorry, there was an error processing your request.', 'bot');
             }
         }
+
+    function handleOutsideClick(event) {
+        const container = document.getElementById('chatContainer');
+        const icon = document.querySelector('.chat-icon');
+
+        // Check if the click is outside the chat container or chat icon
+        if (!container.contains(event.target) && !icon.contains(event.target)) {
+            toggleChat(); // Close the chat
+        }
+    }
+
     function toggleChat() {
             const container = document.getElementById('chatContainer');
             const header = document.getElementById('chat-header-two');
             isChatOpen = !isChatOpen;
             container.style.display = isChatOpen ? 'flex' : 'none';
+            if (isChatOpen) {
+            document.addEventListener('click', handleOutsideClick);
+            } else {
+            document.removeEventListener('click', handleOutsideClick);
+        }
             header.addEventListener('mousedown', (e) => {
     isMouseDown = true;
     const x = e.clientX - container.offsetLeft;

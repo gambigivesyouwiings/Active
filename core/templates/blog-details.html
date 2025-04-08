@@ -115,7 +115,7 @@
               <div class="swiper-slide">
                 <div class="team">
                   <div class="pic">
-                    <img src="{{img_url}}" alt="Image" class="img-fluid">
+                    <img src="{{img_url}}" alt="Image" class="card-team-img-top">
                   </div>
                 </div>
               </div>
@@ -141,20 +141,22 @@
                 },
                 "breakpoints": {
                   "640": {
-                    "slidesPerView": 2,
+                    "slidesPerView": 1,
                     "spaceBetween": 30
                   },
                   "768": {
-                    "slidesPerView": 3,
+                    "slidesPerView": 2,
                     "spaceBetween": 30
                   },
                   "1200": {
-                    "slidesPerView": 3,
+                    "slidesPerView": 2,
                     "spaceBetween": 30
                   }
                 }
               }
-            </script>
+        </script>
+
+
           </div>
         </div>
         <!-- /.container -->
@@ -185,7 +187,7 @@
                   <ul>
                     <li class="d-flex align-items-center"><i class="bi bi-cash"></i> <a href="#">Price: Ksh {{price}}</a></li>
                     <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href="#">Model Year: {{post.model_year}}</a></li>
-                    <li class="d-flex align-items-center"><i class="bi bi-star"></i> <a href="#">{{post.fuel}} vehicle</a></li>
+                    <li class="d-flex align-items-center"><i class="bi bi-star"></i> <a href="#">{{post.fuel.capitalize()}} vehicle</a></li>
                   </ul>
                 </div><!-- End meta top -->
 
@@ -211,6 +213,31 @@
                 </div><!-- End meta bottom -->
 
               </article>
+              <div class="accordion mt-5" id="specAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="specHeader">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecs" aria-expanded="true" aria-controls="collapseSpecs">
+                        View Specifications
+                    </button>
+                </h2>
+                <div id="collapseSpecs" class="accordion-collapse collapse" aria-labelledby="specHeader" data-bs-parent="#specAccordion">
+                    <div class="accordion-body">
+                    <ul class="spec-list">
+                      {% for feature in features %}
+                      <li class="spec-item">
+                            <span class="spec-label">{{feature|capitalize}}:</span> ✔
+                      </li>
+                      {% endfor %}
+                      {% for k,v in specs.items() %}
+                      <li class="spec-item">
+                            <span class="spec-label">{{k|capitalize}}:</span> {{v}}
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    </div>
+                </div>
+            </div>
+            </div>
 
             </div>
           </section><!-- /Blog Details Section -->
@@ -242,32 +269,6 @@
                 <p>Fuel Type: {{post.fuel}}</p>
                 <p>Condition: {{post.condition}}</p>
                 <p>Drive: {{post.drive_type}}</p>
-
-                <div class="accordion mt-3" id="specAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="specHeader">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecs" aria-expanded="true" aria-controls="collapseSpecs">
-                        View Specifications
-                    </button>
-                </h2>
-                <div id="collapseSpecs" class="accordion-collapse collapse" aria-labelledby="specHeader" data-bs-parent="#specAccordion">
-                    <div class="accordion-body">
-                    <ul class="spec-list">
-                      {% for feature in features %}
-                      <li class="spec-item">
-                            <span class="spec-label">{{feature|capitalize}}:</span> ✔
-                      </li>
-                      {% endfor %}
-                      {% for k,v in specs.items() %}
-                      <li class="spec-item">
-                            <span class="spec-label">{{k|capitalize}}:</span> {{v}}
-                      </li>
-                      {% endfor %}
-                    </ul>
-                    </div>
-                </div>
-            </div>
-            </div>
             </div>
             </div><!--/Blog Author Widget -->
 
