@@ -1,0 +1,33 @@
+<div id="image-preview-container" class="row sortable sortable-scroll-container"
+                    hx-post="{{ url_for('update_image_order') }}"
+                    hx-trigger="request"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-swap="outerHTML"
+                    hx-include="[name='index'], [name='order[]']"
+                    hx-target="#image-preview-container"
+                >
+            <input type="hidden" name="index" value="{{ vehicle.id }}">
+            <div class="image-scroll-wrapper">  <!-- New wrapper -->
+            {% for image in images %}
+            <div class="image-container draggable-image" data-image-url="{{ image }}">
+                <img src="{{ image }}" alt="Post Image" class="img-thumbnail mb-2" style="max-height: 200px; cursor: grab;">
+                <input type="hidden" name="order[]" value="{{ image }}">
+                <div>
+                    <label>
+                        <input type="checkbox" name="delete_images" value="{{ loop.index0 }}">
+                        Delete
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="thumbnail_image" value="{{ loop.index0 }}">
+                        Set as Thumbnail
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+            <!-- Scroll shadow elements -->
+            <div class="scroll-shadow left"></div>
+            <div class="scroll-shadow right"></div>
+        </div>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, EmailField, FileField, IntegerField, SelectField, MultipleFileField
+from wtforms import StringField, SubmitField, PasswordField, EmailField, FileField, IntegerField, SelectField, MultipleFileField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, Length, InputRequired, NumberRange, Regexp
 from flask_ckeditor import CKEditorField
 from flask_wtf.file import FileField, FileRequired, FileAllowed, FileSize
@@ -76,8 +76,38 @@ class CreatePostForm(FlaskForm):
         ],
         default='Foreign used'  # Set the default selected value
     )
-    extras = CKEditorField("Car Features ie Sunroof, ApplePlay ,Trimming: Wood...", validators=[DataRequired()])
     description = CKEditorField("Short Description of the car", validators=[DataRequired()])
+
+    # Comfort Features
+    sunroof = BooleanField('Sunroof')
+    trimming = SelectField('Trimming', choices=[('', 'Select Trimming'), ('wood', 'Wood'), ('aluminum', 'Aluminum'),
+                                                ('carbon_fiber', 'Carbon Fiber'), ('other', 'Other')])
+    heated_seats = BooleanField('Heated Seats')
+    sound_system = StringField('Sound System',
+                               render_kw={"placeholder": "e.g., Bose, Harman Kardon, Factory Sound system"})
+    power_windows = BooleanField('Power Windows')
+    seat_material = SelectField('Seat Material',
+                                choices=[('', 'Select Material'), ('leather', 'Leather'), ('cloth', 'Cloth'),
+                                         ('vinyl', 'Vinyl'), ('suede', 'Suede'), ('alcantara', 'Alcantara')])
+    air_conditioning = SelectField('Air Conditioning', choices=[('', 'Select Type'), ('single_zone', 'Single Zone'),
+                                                                ('multi_zone', 'Multi Zone'),
+                                                                ('automatic', 'Automatic')])
+    powered_tailgate = BooleanField('Powered Tailgate')
+    phone_connectivity = BooleanField('Phone Connectivity (Bluetooth, etc.)')
+    auto_start_stop = BooleanField('Auto Start And Stop')
+
+    # Safety Features
+    srs_air_bags = BooleanField('SRS Air Bags')
+    lane_assistance = BooleanField('Lane Assistance')
+    hill_descent_control = BooleanField('Hill Descent Control')
+    roll_stability_control = BooleanField('Roll Stability Control')
+    standard_cruise_control = BooleanField('Standard Cruise Control')
+    adaptive_cruise_control = BooleanField('Adaptive Cruise Control')
+    antilock_braking_system = BooleanField('Antilock Braking System')
+    emergency_braking_assist = BooleanField('Emergency Braking Assist')
+    immobilizer_and_anti_theft = BooleanField('Immobilizer And Anti Theft')
+    electronic_stability_control = BooleanField('Electronic Stability Control')
+
     submit = SubmitField("Submit Post")
 
 
@@ -175,8 +205,37 @@ class EditForm(FlaskForm):
         ],
         default='Foreign used'  # Set the default selected value
     )
-    extras = CKEditorField("Car Features ie Sunroof, ApplePlay ,Trimming: Wood...", validators=[DataRequired()])
     description = CKEditorField("Short Description of the car", validators=[DataRequired()])
+
+    # Comfort Features
+    sunroof = BooleanField('Sunroof')
+    trimming = SelectField('Trimming', choices=[('', 'Select Trimming'), ('wood', 'Wood'), ('aluminum', 'Aluminum'),
+                                                ('carbon_fiber', 'Carbon Fiber'), ('other', 'Other')])
+    heated_seats = BooleanField('Heated Seats')
+    sound_system = StringField('Sound System',
+                               render_kw={"placeholder": "e.g., Bose, Harman Kardon, Factory Sound system"})
+    power_windows = BooleanField('Power Windows')
+    seat_material = SelectField('Seat Material',
+                                choices=[('', 'Select Material'), ('leather', 'Leather'), ('cloth', 'Cloth'),
+                                         ('vinyl', 'Vinyl'), ('suede', 'Suede'), ('alcantara', 'Alcantara')])
+    air_conditioning = SelectField('Air Conditioning', choices=[('', 'Select Type'), ('single_zone', 'Single Zone'),
+                                                                ('multi_zone', 'Multi Zone'),
+                                                                ('automatic', 'Automatic')])
+    powered_tailgate = BooleanField('Powered Tailgate')
+    phone_connectivity = BooleanField('Phone Connectivity (Bluetooth, etc.)')
+    auto_start_stop = BooleanField('Auto Start And Stop')
+
+    # Safety Features
+    srs_air_bags = BooleanField('SRS Air Bags')
+    lane_assistance = BooleanField('Lane Assistance')
+    hill_descent_control = BooleanField('Hill Descent Control')
+    roll_stability_control = BooleanField('Roll Stability Control')
+    standard_cruise_control = BooleanField('Standard Cruise Control')
+    adaptive_cruise_control = BooleanField('Adaptive Cruise Control')
+    antilock_braking_system = BooleanField('Antilock Braking System')
+    emergency_braking_assist = BooleanField('Emergency Braking Assist')
+    immobilizer_and_anti_theft = BooleanField('Immobilizer And Anti Theft')
+    electronic_stability_control = BooleanField('Electronic Stability Control')
 
     submit = SubmitField("Submit Post")
 

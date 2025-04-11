@@ -16,11 +16,21 @@ from pathlib import Path
 from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
 import re
+import json
 
 
 def create_app():
     with app.app_context():
         db.create_all()
+
+
+def generate_unique_filename(destination, filename):
+    name, ext = os.path.splitext(filename)
+    counter = 1
+    while os.path.exists(os.path.join(destination, filename)):
+        filename = f"{name}_{counter}{ext}"
+        counter += 1
+    return filename
 
 
 def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fuel, transmission, mileage, drive_type,
@@ -353,12 +363,19 @@ def blog_details(post_id):
 
     number = int(post.price)
     price = f"{number:,}"
-    features = post.extras.split(",")
-    feature = [x.strip() for x in features if len(x.split(":")) <= 1]
-    spects = {
-        x.split(":")[0].strip(): x.split(":")[1].strip()
-        for x in re.split(r"[,;]", post.extras) if ":" in x
-    }
+    features_data = {}
+    if post.extras:
+        try:
+            features_data = json.loads(post.extras)
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON for vehicle ID {post_id}: {post.extras}")
+            features_data = {'error': 'Could not load features'}
+    # features = post.extras.split(",")
+    # feature = [x.strip() for x in features if len(x.split(":")) <= 1]
+    # spects = {
+    #     x.split(":")[0].strip(): x.split(":")[1].strip()
+    #     for x in re.split(r"[,;]", post.extras) if ":" in x
+    # }
     # if post.user_id:
     #     user = db.session.query(Users).filter_by(id=post.user_id).first()
     #     if user:
@@ -371,7 +388,7 @@ def blog_details(post_id):
 
     phone_number = "+254732252382"
 
-    return render_template("blog-details.html", phone_number=phone_number, specs=spects, features=feature,
+    return render_template("blog-details.html", phone_number=phone_number, features=features_data,
                            images=images, post=post, price=price, csrf_token=generate_csrf())
 
 
@@ -386,7 +403,7 @@ def search():
         # results = Catalogue.query.limit(20).all()
         return '<div class="p-2 hide bd-highlight" id="results"></div>'
     if results:
-        print(results)
+        pass
     else:
         return render_template("noresults.html")
 
@@ -459,9 +476,40 @@ def upload():
         for file in form.file.data:
             # Process each file (e.g., save to a directory)
             file_name = secure_filename(file.filename)
-            file.save(f'{destination}/{file_name}')
-            uploaded_files.append(file_name)
+            unique_filename = generate_unique_filename(destination, file_name)
+            file.save(f'{destination}/{unique_filename}')
+            uploaded_files.append(unique_filename)
             # Pass the data to the `save_post` function
+
+        features = {
+            'comfort': {
+                'sunroof': form.sunroof.data,
+                'trimming': form.trimming.data,
+                'heated_seats': form.heated_seats.data,
+                'sound_system': form.sound_system.data,
+                'power_windows': form.power_windows.data,
+                'seat_material': form.seat_material.data,
+                'air_conditioning': form.air_conditioning.data,
+                'powered_tailgate': form.powered_tailgate.data,
+                'phone_connectivity': form.phone_connectivity.data,
+                'auto_start_stop': form.auto_start_stop.data,
+            },
+            'safety': {
+                'srs_air_bags': form.srs_air_bags.data,
+                'lane_assistance': form.lane_assistance.data,
+                'hill_descent_control': form.hill_descent_control.data,
+                'roll_stability_control': form.roll_stability_control.data,
+                'standard_cruise_control': form.standard_cruise_control.data,
+                'adaptive_cruise_control': form.adaptive_cruise_control.data,
+                'antilock_braking_system': form.antilock_braking_system.data,
+                'emergency_braking_assist': form.emergency_braking_assist.data,
+                'immobilizer_and_anti_theft': form.immobilizer_and_anti_theft.data,
+                'electronic_stability_control': form.electronic_stability_control.data,
+            }
+        }
+
+        extras = json.dumps(features)  # Serialize the dictionary to JSON
+
         save_post(
             img_url=f"{uploaded_files}",  # Pass the list of file paths as the image URLs
             brand=form.brand.data,
@@ -474,7 +522,7 @@ def upload():
             mileage=form.mileage.data,
             drive_type=form.drive_type.data,
             folder=f"/static/assets/cars/{new_name}",  # Using the brand as the folder name for simplicity
-            extras=form.extras.data,
+            extras=extras,
             description=form.description.data,
             availability=form.availability.data,  # This can be extended for user input or other logic
             condition=form.condition.data,
@@ -598,7 +646,8 @@ def edit(index):
     # Extract image URLs and paths
     folder = vehicle.folder_name
     urls = [url.strip().strip("'") for url in vehicle.img_url.strip("[]").split(",")]
-    images = [os.path.join(folder, url) for url in urls]
+    images = [f"{folder}/{url}" for url in urls]
+    print(images)
 
     # Populate form fields for GET requests
     if request.method == 'GET':
@@ -613,9 +662,35 @@ def edit(index):
         form.transmission.data = vehicle.transmission
         form.drive_type.data = vehicle.drive_type
         form.availability.data = vehicle.availability
-        form.extras.data = vehicle.extras
         form.condition.data = vehicle.condition or 'Foreign-used'
         form.description.data = vehicle.description or 'N/A'
+        if vehicle.extras:
+            try:
+                features = json.loads(vehicle.extras)
+                if 'comfort' in features:
+                    form.sunroof.data = features['comfort'].get('sunroof')
+                    form.trimming.data = features['comfort'].get('trimming')
+                    form.heated_seats.data = features['comfort'].get('heated_seats')
+                    form.sound_system.data = features['comfort'].get('sound_system')
+                    form.power_windows.data = features['comfort'].get('power_windows')
+                    form.seat_material.data = features['comfort'].get('seat_material')
+                    form.air_conditioning.data = features['comfort'].get('air_conditioning')
+                    form.powered_tailgate.data = features['comfort'].get('powered_tailgate')
+                    form.phone_connectivity.data = features['comfort'].get('phone_connectivity')
+                    form.auto_start_stop.data = features['comfort'].get('auto_start_stop')
+                if 'safety' in features:
+                    form.srs_air_bags.data = features['safety'].get('srs_air_bags')
+                    form.lane_assistance.data = features['safety'].get('lane_assistance')
+                    form.hill_descent_control.data = features['safety'].get('hill_descent_control')
+                    form.roll_stability_control.data = features['safety'].get('roll_stability_control')
+                    form.standard_cruise_control.data = features['safety'].get('standard_cruise_control')
+                    form.adaptive_cruise_control.data = features['safety'].get('adaptive_cruise_control')
+                    form.antilock_braking_system.data = features['safety'].get('antilock_braking_system')
+                    form.emergency_braking_assist.data = features['safety'].get('emergency_braking_assist')
+                    form.immobilizer_and_anti_theft.data = features['safety'].get('immobilizer_and_anti_theft')
+                    form.electronic_stability_control.data = features['safety'].get('electronic_stability_control')
+            except json.JSONDecodeError:
+                flash("Error loading existing features.", "warning")
 
     if form.validate_on_submit():
         profile = Users.query.get_or_404(current_user.id)
@@ -627,7 +702,7 @@ def edit(index):
 
         # Update vehicle details from form data
         for field in ['brand', 'vehicle_type', 'model_year', 'engine_rating',
-                      'price', 'mileage', 'fuel', 'transmission', 'drive_type', 'availability', 'extras', 'condition',
+                      'price', 'mileage', 'fuel', 'transmission', 'drive_type', 'availability', 'condition',
                       'description']:
             setattr(vehicle, field, getattr(form, field).data)
 
@@ -639,6 +714,35 @@ def edit(index):
         else:
             vehicle.reserved = False
             vehicle.sold = False
+
+        features = {
+            'comfort': {
+                'sunroof': form.sunroof.data,
+                'trimming': form.trimming.data,
+                'heated_seats': form.heated_seats.data,
+                'sound_system': form.sound_system.data,
+                'power_windows': form.power_windows.data,
+                'seat_material': form.seat_material.data,
+                'air_conditioning': form.air_conditioning.data,
+                'powered_tailgate': form.powered_tailgate.data,
+                'phone_connectivity': form.phone_connectivity.data,
+                'auto_start_stop': form.auto_start_stop.data,
+            },
+            'safety': {
+                'srs_air_bags': form.srs_air_bags.data,
+                'lane_assistance': form.lane_assistance.data,
+                'hill_descent_control': form.hill_descent_control.data,
+                'roll_stability_control': form.roll_stability_control.data,
+                'standard_cruise_control': form.standard_cruise_control.data,
+                'adaptive_cruise_control': form.adaptive_cruise_control.data,
+                'antilock_braking_system': form.antilock_braking_system.data,
+                'emergency_braking_assist': form.emergency_braking_assist.data,
+                'immobilizer_and_anti_theft': form.immobilizer_and_anti_theft.data,
+                'electronic_stability_control': form.electronic_stability_control.data,
+            }
+        }
+
+        vehicle.extras = json.dumps(features)  # Serialize the dictionary to JSON
 
         # Process thumbnail assignment first
         thumbnail_image_id = request.form.get("thumbnail_image")  # Thumbnail index (optional)
@@ -654,7 +758,8 @@ def edit(index):
             selected_indices = list(map(int, selected_images))  # Convert indices to integers
             for idx in selected_indices:
                 try:
-                    os.remove(images[idx])  # Remove physical file
+                    os.remove(f"core/{images[idx]}")  # Remove physical file
+                    print(f"Deleting {images[idx]}")
                 except FileNotFoundError:
                     print(f"File {images[idx]} not found.")
             # Remove URLs from the list in reverse order to prevent index shifting
@@ -673,7 +778,8 @@ def edit(index):
             for file in form.file.data:
                 if file.filename:  # Only process files with a valid filename
                     file_name = secure_filename(file.filename)
-                    file_path = f'core/{folder.strip("/")}/{file_name}'
+                    unique_filename = generate_unique_filename(f"core/{folder}", file_name)
+                    file_path = f'core/{folder.strip("/")}/{unique_filename}'
                     file.save(file_path)
                     urls.append(file_name)
 
@@ -686,8 +792,32 @@ def edit(index):
         db.session.commit()  # Save changes to the database
         return redirect(url_for('blog', page=page))  # Redirect after successful update
 
-    return render_template('edit.html', images=images, form=form, vehicle=vehicle)
+    return render_template('edit.html', csrf_token=generate_csrf(), images=images, form=form, vehicle=vehicle)
 
+
+@app.route("/update-image-order", methods=["POST"])
+@admin_only
+def update_image_order():
+    index = request.form.get('index')
+    print(index)
+    vehicle = Catalogue.query.get_or_404(index)
+    new_order = request.form.getlist('order[]')  # This will now correctly receive the data
+
+    if new_order:
+        print(new_order)
+        urls = [img_url.split('/')[-1] for img_url in new_order]
+        vehicle.img_url = f"[{', '.join(urls)}]"
+        db.session.commit()
+        # print(f"[{', '.join(urls)}]")
+        # print(urls)
+
+        # Re-render the image preview section
+        folder = vehicle.folder_name
+        urls = [url.strip().strip("'") for url in vehicle.img_url.strip("[]").split(",")]
+        images = [f"{folder}/{url}" for url in urls]
+        return render_template('_image_preview.html', csrf_token=generate_csrf(), images=images, vehicle=vehicle)
+    else:
+        return render_template('_error_message.html', error="No image order received."), 400
 
 # if edit_form.validate_on_submit():
 #     img_to_remove = request.args.get("img_to_remove")

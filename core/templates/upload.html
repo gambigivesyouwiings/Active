@@ -51,7 +51,114 @@
             <br>
             <form method="POST" action="/upload" enctype="multipart/form-data">
                   {{ form.hidden_tag() }}
-              {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}
+                {{ wtf.form_field(form.file) }}
+                  <hr class="my-4">
+    <h5>Specifications</h5>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.brand) }}
+            {{ wtf.form_field(form.model) }}
+            {{ wtf.form_field(form.vehicle_type) }}
+            {{ wtf.form_field(form.model_year) }}
+            {{ wtf.form_field(form.engine_rating) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.price) }}
+            {{ wtf.form_field(form.mileage) }}
+            {{ wtf.form_field(form.fuel) }}
+            {{ wtf.form_field(form.transmission) }}
+            {{ wtf.form_field(form.drive_type) }}
+            {{ wtf.form_field(form.availability) }}
+            {{ wtf.form_field(form.condition) }}
+        </div>
+    </div>
+    <hr class="my-4">
+    <h5>Comfort Features</h5>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.form_field(form.seat_material) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.trimming) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.air_conditioning) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.sound_system) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.power_windows) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.form_field(form.sunroof) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.heated_seats) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.powered_tailgate) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.phone_connectivity) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.auto_start_stop) }}
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <h5>Safety Features</h5>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.srs_air_bags) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.lane_assistance) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.hill_descent_control) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.roll_stability_control) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.standard_cruise_control) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.adaptive_cruise_control) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.antilock_braking_system) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.emergency_braking_assist) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.immobilizer_and_anti_theft) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.electronic_stability_control) }}
+        </div>
+    </div>
+
+    {{ wtf.form_field(form.description) }}
+    {{ form.submit(class="btn btn-primary") }}
+<!--              {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}-->
             </form>
             <!--            <form action = "{{url_for('upload') }}" method="POST" enctype="multipart/form-data" id="file-form">-->
 <!--              <input class="cta-btn" id="media" type="file" name="file" multiple >-->

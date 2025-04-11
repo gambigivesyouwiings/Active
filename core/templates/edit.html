@@ -9,7 +9,7 @@
         color:  #0087F7;
     }
     #fike {border: 2px dashed #0087F7;
-        margin: 10%;
+        margin:10% 0%;
         min-height: 100px;
         color:  #0087F7;}
     /* Add margin between form elements */
@@ -29,6 +29,110 @@
     .custom-form .btn-primary {
         margin-top: 10px;
     }
+
+    .sortable {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+    .ui-sortable-helper {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transform: scale(1.05);
+        transition: none !important;
+        opacity: 0.9 !important;
+    }
+
+    .dragging {
+        cursor: grabbing !important;
+        scroll-behavior: auto !important;
+    }
+
+    .draggable-image {
+        cursor: grab;
+        transition: opacity 0.3s ease, transform 0.2s ease;
+        opacity: 1;
+    }
+    .draggable-image img {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .sortable-scroll-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 1rem 0;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+        width: 100%;
+    }
+
+    .image-scroll-wrapper {
+        display: inline-flex; /* Changed from inline-block */
+        gap: 1rem; /* Replace margin-right on items */
+        padding: 0 1rem;
+        min-width: auto; /* Changed from 100% */
+    }
+
+    .image-container {
+        display: inline-flex; /* Changed from inline-block */
+        flex-direction: column;
+        position: relative;
+        width: 200px;
+        flex-shrink: 0; /* Prevent items from shrinking */
+        transition: transform 0.1s;
+        vertical-align: top;
+        opacity: 1;
+    }
+
+    .image-container img {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+        pointer-events: none; /* Improve drag performance */
+    }
+
+    /* Custom scrollbar */
+    .sortable-scroll-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .sortable-scroll-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sortable-scroll-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .sortable-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .scroll-shadow {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 30px;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
+
+    .scroll-shadow.left {
+        left: 0;
+        background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 100%);
+    }
+
+    .scroll-shadow.right {
+        right: 0;
+        background: linear-gradient(to left, rgba(0,0,0,0.1) 0%, transparent 100%);
+    }
+
+    .sortable-scroll-container.scrolling .scroll-shadow {
+        opacity: 1;
+    }
   </style>
 
   <main id="main" data-aos="fade" data-aos-delay="100">
@@ -38,35 +142,269 @@
       <div class="container position-relative">
         <div class="row d-flex justify-content-center">
           <div class="col-lg-6 text-center">
-            <h2>Choose a new thumbnail for your video</h2>
-              <p>Upload a new thumbnail</p>
-
+            <h2>Now editing {{vehicle.brand.capitalize()}} {{vehicle.title.capitalize()}}</h2>
+              <p>Change vehicle info</p>
             <form method="POST" action="" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
-
-    <!-- Render images -->
-    <div class="mb-3">
-        <label class="form-label">Current Images:</label>
-        <div class="row">
+            <div class="mb-3">
+                <label class="form-label">Drag and Drop Images (Reorder to set precedence):</label>
+                <div id="image-preview-container" class="row sortable sortable-scroll-container"
+                    hx-post="{{ url_for('update_image_order') }}"
+                    hx-trigger="request"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-swap="outerHTML"
+                    hx-include="[name='index'], [name='order[]']"
+                    hx-target="#image-preview-container"
+                >
+            <input type="hidden" name="index" value="{{ vehicle.id }}">
+            <div class="image-scroll-wrapper">  <!-- New wrapper -->
             {% for image in images %}
-                <div class="col-md-3 col-sm-6 col-6 text-center">
-                    <img src="{{ image }}" alt="Post Image" class="img-thumbnail mb-2" style="max-height: 200px;">
-                    <div>
-                      <label>
-                        <input type="checkbox" name="delete_images" value="{{ images.index(image) }}">
-                        Delete</label>
-                    </div>
-                    <!-- Thumbnail Radio Button -->
+            <div class="image-container draggable-image" data-image-url="{{ image }}">
+                <img src="{{ image }}" alt="Post Image" class="img-thumbnail mb-2" style="max-height: 200px; cursor: grab;">
+                <input type="hidden" name="order[]" value="{{ image }}">
                 <div>
-                    <label><input type="radio" name="thumbnail_image" value="{{ images.index(image) }}">
-                    Set as Thumbnail</label>
+                    <label>
+                        <input type="checkbox" name="delete_images" value="{{ loop.index0 }}">
+                        Delete
+                    </label>
                 </div>
+                <div>
+                    <label>
+                        <input type="radio" name="thumbnail_image" value="{{ loop.index0 }}">
+                        Set as Thumbnail
+                    </label>
                 </div>
+            </div>
             {% endfor %}
+            </div>
+            <!-- Scroll shadow elements -->
+            <div class="scroll-shadow left"></div>
+            <div class="scroll-shadow right"></div>
+        </div>
+        <p class="mt-2 text-muted">Drag and drop images to reorder them. The order here will determine their precedence.</p>
+    </div>
+
+    {{ form.hidden_tag() }}
+    <hr class="my-4">
+    <h5>Specifications</h5>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.brand) }}
+            {{ wtf.form_field(form.model) }}
+            {{ wtf.form_field(form.stock) }}
+            {{ wtf.form_field(form.vehicle_type) }}
+            {{ wtf.form_field(form.model_year) }}
+            {{ wtf.form_field(form.engine_rating) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.price) }}
+            {{ wtf.form_field(form.mileage) }}
+            {{ wtf.form_field(form.fuel) }}
+            {{ wtf.form_field(form.transmission) }}
+            {{ wtf.form_field(form.drive_type) }}
+            {{ wtf.form_field(form.availability) }}
+            {{ wtf.form_field(form.condition) }}
         </div>
     </div>
-            {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}
-            </form>
+    <hr class="my-4">
+    <h5>Comfort Features</h5>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.form_field(form.seat_material) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.trimming) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.air_conditioning) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.sound_system) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.power_windows) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.form_field(form.sunroof) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.heated_seats) }}
+        </div>
+        <div class="col-md-4">
+            {{ wtf.form_field(form.powered_tailgate) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.phone_connectivity) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.auto_start_stop) }}
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <h5>Safety Features</h5>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.srs_air_bags) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.lane_assistance) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.hill_descent_control) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.roll_stability_control) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.standard_cruise_control) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.adaptive_cruise_control) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.antilock_braking_system) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.emergency_braking_assist) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.form_field(form.immobilizer_and_anti_theft) }}
+        </div>
+        <div class="col-md-6">
+            {{ wtf.form_field(form.electronic_stability_control) }}
+        </div>
+    </div>
+
+    {{ wtf.form_field(form.file) }}
+    {{ wtf.form_field(form.description) }}
+    {{ form.submit(class="btn btn-primary") }}
+<!--    {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}-->
+</form>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+        // Modified initialization function
+    function initImageSortable() {
+        const container = $('#image-preview-container');
+        let maxScroll = 0;
+        let isDragging = false;
+
+        // Destroy previous sortable instance
+        if (container.sortable('instance')) {
+            container.sortable('destroy');
+        }
+
+        // Initialize new sortable
+        container.sortable({
+            items: '.draggable-image',
+            cursor: 'grabbing',
+            axis: 'x',
+            containment: 'parent',
+            scroll: false,
+            delay: 50,
+            tolerance: 'pointer',
+            helper: function(e, ui) {
+                // Preserve original dimensions during drag
+                return ui.clone().css({
+                    width: ui.outerWidth(),
+                    height: ui.outerHeight(),
+                    pointerEvents: 'none'
+                });
+            },
+            start: function(e, ui) {
+                isDragging = true;
+                container.addClass('dragging');
+                maxScroll = container[0].scrollWidth - container.width();
+                ui.helper.css({
+                    zIndex: 1000,
+                    transform: 'scale(1.02)'
+                });
+            },
+            stop: function(e, ui) {
+                isDragging = false;
+                container.removeClass('dragging');
+                htmx.trigger(container[0], 'request');
+            },
+            sort: function(e, ui) {
+                if (!isDragging) return;
+
+                const sensitivity = 50;
+                const scrollSpeed = 30;
+                const currentScroll = container.scrollLeft();
+                const mouseX = e.pageX - container.offset().left;
+
+                // Left edge scroll
+                if (mouseX < sensitivity) {
+                    const newScroll = Math.max(0, currentScroll - scrollSpeed);
+                    container.scrollLeft(newScroll);
+                }
+                // Right edge scroll
+                else if (mouseX > container.width() - sensitivity) {
+                    const newScroll = Math.min(maxScroll, currentScroll + scrollSpeed);
+                    container.scrollLeft(newScroll);
+                }
+
+                // Update scroll shadows
+                container.toggleClass('can-scroll-left', currentScroll > 0);
+                container.toggleClass('can-scroll-right', currentScroll < maxScroll);
+            }
+        });
+
+        // Scroll shadow logic
+        container.on('scroll', function() {
+            if (!isDragging) {
+                const currentScroll = container.scrollLeft();
+                container.toggleClass('can-scroll-left', currentScroll > 0);
+                container.toggleClass('can-scroll-right', currentScroll < maxScroll);
+            }
+        });
+
+        // Reinitialize scroll shadows
+        setTimeout(() => {
+            maxScroll = container[0].scrollWidth - container.width();
+            container.toggleClass('can-scroll-right', maxScroll > 0);
+        }, 100);
+    }
+
+    // Initialize on page load
+    $(document).ready(initImageSortable);
+
+    // Reinitialize after HTMX updates
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.detail.target.id === 'image-preview-container') {
+            initImageSortable();
+        }
+    });
+
+    // Handle image loading
+    document.body.addEventListener('htmx:afterProcessNode', function(evt) {
+        const images = evt.detail.elt.querySelectorAll('.draggable-image img');
+        images.forEach(img => {
+            img.onload = function() {
+                this.style.opacity = '1';
+            };
+            if (img.complete) img.style.opacity = '1';
+        });
+    });
+</script>
+
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <p class="notification is-danger" style="color:red">

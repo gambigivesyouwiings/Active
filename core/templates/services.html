@@ -1,13 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
@@ -101,14 +92,80 @@
         </nav>
       </div>
     </div><!-- End Page Title -->
+    <!-- About Section -->
+    <section id="about" class="about section">
 
+      <div class="container">
+        <div class="row align-items-center justify-content-between">
+          <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2" data-aos="fade-up" data-aos-delay="100">
+            <div class="swiper init-swiper">
+              <script type="application/json" class="swiper-config">
+                {
+                  "loop": true,
+                  "speed": 600,
+                  "autoplay": {
+                    "delay": 5000
+                  },
+                  "slidesPerView": "auto",
+                  "pagination": {
+                    "el": ".swiper-pagination",
+                    "type": "bullets",
+                    "clickable": true
+                  },
+                  "breakpoints": {
+                    "320": {
+                      "slidesPerView": 1,
+                      "spaceBetween": 40
+                    },
+                    "1200": {
+                      "slidesPerView": 1,
+                      "spaceBetween": 1
+                    }
+                  }
+                }
+              </script>
+              <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                  <img src="/static/assets/img/img_h_6.jpg" alt="Image" class="img-fluid">
+                </div>
+                <div class="swiper-slide">
+                  <img src="/static/assets/img/img_h_7.jpg" alt="Image" class="img-fluid">
+                </div>
+                <div class="swiper-slide">
+                  <img src="/static/assets/img/img_h_8.jpg" alt="Image" class="img-fluid">
+                </div>
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+          <div class="col-lg-4 order-lg-1">
+            <span class="section-subtitle" data-aos="fade-up">Welcome</span>
+            <h1 class="mb-4" data-aos="fade-up">
+              Our Services:
+            </h1>
+            <p data-aos="fade-up">
+              From the best deals on the latest wheels, to vehicle trade-in and auto services.
+              We cater for all your car needs, from a sporty Benz down to a simple oil change.
+            </p>
+              <ul data-aos="fade-up">
+                <li>Wheel Alignment</li>
+                <li>Car Servicing</li>
+                <li>Car wash & waxing</li>
+              </ul>
+            <p class="mt-5" data-aos="fade-up">
+              <a href="url_for('contact')" class="btn btn-get-started">Get Started</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section><!-- /About Section -->
     <!-- Services 2 Section -->
     <section id="services-2" class="services-2 section">
 
       <div class="container">
         <div class="row justify-content-center" data-aos="fade-up">
           <div class="col-md-6 col-lg-4">
-            <span class="content-subtitle">Our Services</span>
+            <span class="content-subtitle">Our Motto</span>
             <h2 class="content-title">
               You order, We deliver.
             </h2>
@@ -120,9 +177,7 @@
             <p class="mb-5">
               Go Vroom Vroom..... With Mushroom!
             </p>
-            <p>
-              <a href="{{url_for('contact')}}" class="btn btn-get-started">Get Started</a>
-            </p>
+
           </div>
           <div class="col-md-6 col-lg-6 ps-lg-5">
             <div class="row">
