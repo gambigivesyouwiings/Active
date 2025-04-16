@@ -431,7 +431,7 @@ h6 {
   .navmenu .dropdown ul a:hover,
   .navmenu .dropdown ul .active:hover,
   .navmenu .dropdown ul li:hover>a {
-    color: var(--nav-dropdown-background-color);
+    color: var(--nav-dropdown-hover-color);
   }
 
   .navmenu .dropdown>.dropdown-active {
