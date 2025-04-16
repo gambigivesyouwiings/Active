@@ -44,7 +44,7 @@
 
       <a href="{{url_for('home')}}" class="logo d-flex align-items-center">
         <!-- Uncomment the line below if you also wish to use an image logo -->
-         <img src="/static/assets/img/modern_mushroom.jpeg" alt="">
+         <img src="/static/assets/img/modern_mushroom.jpeg" alt="" loading="lazy">
         <h1 class="sitename"> <b>Mushroom Motors.</b></h1>
       </a>
 
@@ -203,7 +203,7 @@
             <a href="{{ url_for('blog_details', post_id=page.id) }}">
         <div class="card card-standard">
             {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
-            <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image">
+            <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">
             {% if page.sold %}
             <span class="badge sold">Sold</span>
             {% elif page.reserved %}
