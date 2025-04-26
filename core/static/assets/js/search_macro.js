@@ -214,6 +214,7 @@ function chooseFilter(event) {
     .then(html => {
         // Update the part of the page with the new HTML
         document.getElementById('results-container').innerHTML = html;
+        htmx.process(document.getElementById('results-container'));
     })
     .catch(error => console.error('Error:', error));
 }

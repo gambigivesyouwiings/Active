@@ -1,0 +1,24 @@
+             <div class="check-stock" id="check-stock-{{page.id}}">
+            {% if page.sold %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+               class="badge sold"><span>Sold</span></a>
+            {% elif page.reserved %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge reserved"><span>Reserved</span></a>
+            {% else %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge availability"><span>Available</span></a>
+            {% endif %}
+            </div>

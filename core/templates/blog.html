@@ -137,11 +137,11 @@
                         500K-1M
                     </label>
                      <label>
-                        <input type="checkbox" name="price" value="1M-1.5M">
+                        <input type="checkbox" name="price" value="1M-1500K">
                         1M-1.5M
                     </label>
                     <label>
-                        <input type="checkbox" name="price" value="1.5M-2M">
+                        <input type="checkbox" name="price" value="1500K-2M">
                         1.5M-2M
                     </label>
                     <label>
@@ -204,14 +204,31 @@
         <div class="card card-standard">
             {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
             <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">
-            {% if page.sold %}
-            <span class="badge sold">Sold</span>
-            {% elif page.reserved %}
-            <span class="badge reserved">Reserved</span>
-            {% else %}
-            <span class="badge availability">Available</span>
-            {% endif %}
             {% if current_user.is_admin %}
+             <div class="check-stock" id="check-stock-{{page.id}}">
+            {% if page.sold %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+               class="badge sold"><span>Sold</span></a>
+            {% elif page.reserved %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge reserved"><span>Reserved</span></a>
+            {% else %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge availability"><span>Available</span></a>
+            {% endif %}
+            </div>
             <div class="edit-deleteone">
             <a href="{{ url_for('edit', index=page.id, page=num ) }}" class="details-link"><span class="edit-deletetwo">edit <i class="bi bi-link-45deg"></i> </span></a>
             <button
@@ -225,6 +242,14 @@
                 </button>
 <!--                <a href="{{ url_for('pre_delete', index=page.id)}}" class="details-link"><span class="edit-deletetwo">delete <i class="bi bi-x-circle-fill"></i> </span></a>-->
             </div>
+            {% else %}
+            {% if page.sold %}
+            <span class="badge sold">Sold</span>
+            {% elif page.reserved %}
+            <span class="badge reserved">Reserved</span>
+            {% else %}
+            <span class="badge availability">Available</span>
+            {% endif %}
             {%endif%}
 
 
@@ -336,6 +361,13 @@
     {% endif %}
 </div>
       <div id="delete-modal" class="modal modal-blur fade" tabindex="-1" style="display: none">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- HTMX will load the confirmation content here -->
+        </div>
+      </div>
+      </div>
+      <div id="edit-modal" class="modal modal-blur fade" tabindex="-2" style="display: none">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <!-- HTMX will load the confirmation content here -->

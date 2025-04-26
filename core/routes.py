@@ -228,7 +228,7 @@ def blog():
     unique = [category[0] for category in unique_brands]
     # Get the page number from the query string
     page = int(request.args.get('page', 1))
-    per_page = 10  # Number of items per page
+    per_page = 12  # Number of items per page
     selected_brand = request.args.get('selected_brand')
     selected_type = request.args.get('selected_type')
     selected_user = request.args.get('selected_user')
@@ -268,6 +268,8 @@ def blog():
                             lambda x: int(x.replace('K', '000').replace('M', '000000').strip()),
                             price_range.split('-')
                         )
+                        print(min_price)
+                        print(max_price)
                         price_filters.append(and_(Catalogue.price >= min_price, Catalogue.price <= max_price))
                 except ValueError:
                     print("error detected")
@@ -427,6 +429,38 @@ def pre_delete(index):
     if not current_user.is_admin:
         abort(403)  # Restrict to admins
     return render_template('confirm_delete_vehicle.html', csrf=generate_csrf(), vehicle=vehicle)
+
+
+@app.route("/stock/<int:index>", methods=["GET", "POST"])
+@admin_only
+def stock(index):
+    vehicle = Catalogue.query.get_or_404(index)
+    if not current_user.is_admin:
+        abort(403)  # Restrict to admins
+    if request.method == "POST":
+        sold = request.form.get('sold') == 'true'
+        reserved = request.form.get('reserved') == 'true'
+        available = request.form.get("availability") == 'true'
+
+        # Fetch the user and toggle stock_availability status
+        if sold:
+            vehicle.sold = True
+            vehicle.reserved = False
+            print("sold")
+        if reserved:
+            vehicle.sold = False
+            vehicle.reserved = True
+            print("reserve")
+        if available:
+            vehicle.sold = False
+            vehicle.reserved = False
+            print("available")
+
+        db.session.commit()
+        # Return a partial HTML snippet with the updated checkbox state
+        return render_template("update_stock.html", page=vehicle)
+
+    return render_template('confirm_stock.html', csrf=generate_csrf(), vehicle=vehicle)
 
 
 @app.route("/delete/<int:post_id>", methods=["DELETE"])

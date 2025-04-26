@@ -4,27 +4,42 @@
 
       <div class="container">
 
-        <div class="row gy-5">
+         <div class="row gy-5">
 
           {% for page in pages %}
-        <div class="col-lg-4 col-md-6 mt-5">
+        <div id="vehicle-{{ page.id }}" class="col-lg-4 col-md-6 mt-5">
             <a href="{{ url_for('blog_details', post_id=page.id) }}">
         <div class="card card-standard">
             {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
-            <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image">
-            {% if page.sold %}
-            <span class="badge sold">Sold</span>
-            {% elif page.reserved %}
-            <span class="badge reserved">Reserved</span>
-            {% else %}
-            <span class="badge availability">Available</span>
-            {% endif %}
+            <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">
             {% if current_user.is_admin %}
+             <div class="check-stock" id="check-stock-{{page.id}}">
+            {% if page.sold %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+               class="badge sold"><span>Sold</span></a>
+            {% elif page.reserved %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge reserved"><span>Reserved</span></a>
+            {% else %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge availability"><span>Available</span></a>
+            {% endif %}
+            </div>
             <div class="edit-deleteone">
-                <a href="{{ url_for('edit', page=num, index=page.id) }}" class="details-link">
-                    <span class="edit-deletetwo">edit <i class="bi bi-link-45deg"></i></span>
-                </a>
-                <button
+            <a href="{{ url_for('edit', index=page.id, page=num ) }}" class="details-link"><span class="edit-deletetwo">edit <i class="bi bi-link-45deg"></i> </span></a>
+            <button
                   class="btn btn-danger btn-sm"
                   hx-get="{{ url_for('pre_delete', index=page.id)}}"
                   hx-target="#delete-modal"
@@ -34,9 +49,17 @@
                   Delete
                 </button>
 <!--                <a href="{{ url_for('pre_delete', index=page.id)}}" class="details-link"><span class="edit-deletetwo">delete <i class="bi bi-x-circle-fill"></i> </span></a>-->
-
             </div>
+            {% else %}
+            {% if page.sold %}
+            <span class="badge sold">Sold</span>
+            {% elif page.reserved %}
+            <span class="badge reserved">Reserved</span>
+            {% else %}
+            <span class="badge availability">Available</span>
             {% endif %}
+            {%endif%}
+
 
 <!--            <div class="d-flex justify-content-between align-items-center mb-3 transparent-bg">-->
 <!--                    <div class="dealer-info">-->
@@ -55,21 +78,20 @@
                 <p class="card-text" >
                     {{page.description or 'insert description here'}}
                 </p>
+            </div>
                 <div class="card-footer">
-                    <h6 class="card-subtitle mb-2 text-muted">Price: KES {{page.price|number_format}}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Price: KES {{ page.price|number_format}}</h6>
                     <a href="{{ url_for('blog_details', post_id=page.id) }}" class="btn md_contact">Contact Seller</a>
                 </div>
-                </div>
+
 
         </div>
-            </a>
+                </a>
     </div>
           {% endfor %}
         </div><!-- End blog posts list -->
 
-      </div>
-
-    </section><!-- /Blog Posts 2 Section -->
+      </div></section><!-- /Blog Posts 2 Section -->
 
     <!-- Blog Pagination Section -->
     <section id="blog-pagination" class="blog-pagination section">

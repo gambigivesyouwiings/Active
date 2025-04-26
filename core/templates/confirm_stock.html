@@ -1,0 +1,46 @@
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+      <div class="modal-header">
+    <h5 class="modal-title">Confirm stock availability</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <p>Choose the availability status of <strong>{{ vehicle.brand }}</strong> {{ vehicle.title }}?</p>
+</div>
+<div class="modal-footer">
+    <button
+        class="btn btn-danger"
+        hx-post="{{ url_for('stock', index=vehicle.id) }}"
+        hx-headers='{"Content-Type": "application/json", "X-CSRFToken": "{{ csrf }}"}'
+        hx-vals='{{ {"sold": True, "reserved": False, "availability": False } | tojson }}'
+        hx-swap="outerHTML"
+        hx-target="#check-stock-{{vehicle.id}}"
+        data-bs-dismiss="modal"
+        >
+        Sold
+    </button>
+    <button
+        class="btn btn-secondary"
+        hx-post="{{ url_for('stock', index=vehicle.id) }}"
+        hx-headers='{"Content-Type": "application/json", "X-CSRFToken": "{{ csrf }}"}'
+        hx-vals='{{ {"sold": False, "reserved": True, "availability": False } | tojson }}'
+        hx-swap="outerHTML"
+        hx-target="#check-stock-{{vehicle.id}}"
+        data-bs-dismiss="modal"
+        >
+        Reserved
+    </button>
+    <button
+        class="btn btn-success"
+        hx-post="{{ url_for('stock', index=vehicle.id) }}"
+        hx-headers='{"Content-Type": "application/json", "X-CSRFToken": "{{ csrf }}"}'
+        hx-vals='{{ {"sold": False, "reserved": False, "availability": True } | tojson }}'
+        hx-swap="outerHTML"
+        hx-target="#check-stock-{{vehicle.id}}"
+        data-bs-dismiss="modal"
+        >
+        Available
+    </button>
+</div>
+      </div>
+</div>

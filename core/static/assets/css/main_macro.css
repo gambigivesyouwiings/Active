@@ -2231,6 +2231,7 @@ font-size: 1em;
      margin-right: 5px; /* Adds spacing between badges */
      background-color: color-mix(in srgb, var(--accent-color), transparent 30%);
      }
+.check-stock a:hover{cursor: pointer;background-color: color-mix(in srgb, var(--contrast-color), transparent 30%);}
 
 .card-body-standard {
      top: 50%;
@@ -2610,7 +2611,7 @@ color: var(--contrast-color);
   justify-content: center;
 }
 
-.blog-pagination li a.active,
+.blog-pagination li.active a,
 .blog-pagination li a:hover {
   background: var(--accent-color);
   color: var(--contrast-color);
@@ -2618,7 +2619,7 @@ color: var(--contrast-color);
 
 .blog-pagination li a.active a,
 .blog-pagination li a:hover a {
-  color: var(--contrast-color);
+  color: var(--accent-color);
 }
 #pagination li.disabled a {
     pointer-events: none;
