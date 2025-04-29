@@ -227,7 +227,7 @@ def blog():
     unique_brands = db.session.query(Catalogue.brand).distinct().all()
     unique = [category[0] for category in unique_brands]
     # Get the page number from the query string
-    page = int(request.args.get('page', 1))
+    page = int(request.args.get('page', '1'))
     per_page = 12  # Number of items per page
     selected_brand = request.args.get('selected_brand')
     selected_type = request.args.get('selected_type')
@@ -675,7 +675,7 @@ def edit_profile(index):
 def edit(index):
     form = EditForm()
     vehicle = Catalogue.query.get_or_404(index)
-    page = int(request.args.get('page', 1))
+    page = int(request.args.get('page', '1'))
 
     # Extract image URLs and paths
     folder = vehicle.folder_name
