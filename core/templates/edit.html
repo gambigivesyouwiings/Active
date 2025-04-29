@@ -159,7 +159,7 @@
             <div class="image-scroll-wrapper">  <!-- New wrapper -->
             {% for image in images %}
             <div class="image-container draggable-image" data-image-url="{{ image }}">
-                <img src="{{ image }}" alt="Post Image" class="img-thumbnail mb-2" style="max-height: 200px; cursor: grab;">
+                <img src="{{ image }}" alt="Post Image" class="img-thumbnail mb-2" style="max-height: 200px; cursor: grab;" loading="lazy">
                 <input type="hidden" name="order[]" value="{{ image }}">
                 <div>
                     <label>

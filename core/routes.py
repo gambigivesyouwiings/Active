@@ -62,7 +62,8 @@ def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fu
 
 image_file_types = ['.webp', '.svg', '.png', '.avif', '.jpg', '.jpeg', '.jfif', '.jpe', '.pjp', '.gif', '.apn']
 
-admin_list = ["balywonder@gmail.com", "pgigz23@gmail.com", "gambikimathi@students.uonbi.ac.ke", "chadkirubi@gmail.com", "njengashwn@gmail.com"]
+admin_list = ["balywonder@gmail.com", "pgigz23@gmail.com", "gambikimathi@students.uonbi.ac.ke", "chadkirubi@gmail.com",
+              "njengashwn@gmail.com"]
 
 
 @login_manager.user_loader
@@ -677,6 +678,9 @@ def edit(index):
     vehicle = Catalogue.query.get_or_404(index)
     page = int(request.args.get('page', '1'))
 
+    if page is None:
+        page = 1
+
     # Extract image URLs and paths
     folder = vehicle.folder_name
     urls = [url.strip().strip("'") for url in vehicle.img_url.strip("[]").split(",")]
@@ -852,6 +856,7 @@ def update_image_order():
         return render_template('_image_preview.html', csrf_token=generate_csrf(), images=images, vehicle=vehicle)
     else:
         return render_template('_error_message.html', error="No image order received."), 400
+
 
 # if edit_form.validate_on_submit():
 #     img_to_remove = request.args.get("img_to_remove")
