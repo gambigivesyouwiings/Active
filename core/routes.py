@@ -339,7 +339,7 @@ def blog():
         return render_template("blog.html", num=page, admin_list=admin_list, pages=pages, brands=unique,
                                csrf_token=generate_csrf())
 
-    pages = db.paginate(db.select(Catalogue).order_by(desc(Catalogue.model_year)), page=page, per_page=per_page)
+    pages = db.paginate(db.select(Catalogue).order_by(desc(Catalogue.id)), page=page, per_page=per_page)
     return render_template("blog.html", num=page, pages=pages, admin_list=admin_list, brands=unique,
                            csrf_token=generate_csrf())
 
