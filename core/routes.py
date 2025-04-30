@@ -17,6 +17,7 @@ from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
 import re
 import json
+import uuid
 
 
 def create_app():
@@ -25,12 +26,19 @@ def create_app():
 
 
 def generate_unique_filename(destination, filename):
-    name, ext = os.path.splitext(filename)
-    counter = 1
-    while os.path.exists(os.path.join(destination, filename)):
-        filename = f"{name}_{counter}{ext}"
-        counter += 1
-    return filename
+    # Use Pathlib for better extension handling
+    path = Path(filename)
+    ext = "".join(path.suffixes)  # Captures all extensions (e.g., .tar.gz)
+    base = path.stem  # Original filename without extensions
+
+    # Generate a unique filename with original base + UUID + extensions
+    while True:
+        unique_name = f"{base}_{uuid.uuid4().hex}{ext}"
+        dest_path = os.path.join(destination, unique_name)
+
+        # Ensure the filename doesn't already exist in the destination
+        if not os.path.exists(dest_path):
+            return unique_name
 
 
 def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fuel, transmission, mileage, drive_type,
@@ -62,8 +70,7 @@ def save_post(img_url, brand, vehicle_type, model_year, engine_rating, price, fu
 
 image_file_types = ['.webp', '.svg', '.png', '.avif', '.jpg', '.jpeg', '.jfif', '.jpe', '.pjp', '.gif', '.apn']
 
-admin_list = ["balywonder@gmail.com", "pgigz23@gmail.com", "gambikimathi@students.uonbi.ac.ke", "chadkirubi@gmail.com",
-              "njengashwn@gmail.com"]
+admin_list = ["balywonder@gmail.com", "pgigz23@gmail.com", "gambikimathi@students.uonbi.ac.ke"]
 
 
 @login_manager.user_loader
