@@ -33,7 +33,7 @@ def generate_unique_filename(destination, filename):
 
     # Generate a unique filename with original base + UUID + extensions
     while True:
-        unique_name = f"{base}_{uuid.uuid4().hex}{ext}"
+        unique_name = f"{uuid.uuid4().hex}{ext}"
         dest_path = os.path.join(destination, unique_name)
 
         # Ensure the filename doesn't already exist in the destination
