@@ -16,6 +16,9 @@
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.g/static.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -261,7 +264,7 @@
                   </ul>
                 </div><!-- End meta top -->
 
-                <div class="content">
+                <div class="content" style="font-family: 'Montserrat', sans-serif;font-optical-sizing: auto; font-weight: 500; font-size: 18px; font-style: normal;">
                   <p>
                     {{post.description or 'N/A'}}
                   </p>
@@ -413,6 +416,118 @@
         </div>
 
       </div>
+      <!-- Blog Posts Section -->
+    <section id="blog-posts" class="blog-posts section">
+      <!-- Section Title -->
+      <div class="container section-title footer" data-aos="fade-up">
+        <h1 class="text-center mb-4">Similar searches</h1>
+          <br>
+        <a href="#" style="color:green"> You may also like: <i class="bi bi-arrow-up-right"></i> </a>
+      </div><!-- End Section Title -->
+      <div class="container">
+
+        <div class="row gy-5">
+    {% for page in pages %}
+            {% if page.id != post.id %}
+        <div id="vehicle-{{ page.id }}" class="col-lg-4 col-md-6 mt-5">
+            <a href="{{ url_for('blog_details', post_id=page.id) }}">
+        <div class="card card-standard">
+            {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
+            <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">
+            <!-- Overlay Div -->
+                <div class="image-overlay">
+                    <!-- Dealer Logo -->
+                    <div class="dealer-logo">
+                        <img src="{{ url_for('static', filename='assets/img/modern_mushroom.jpeg') }}" alt="Dealer Logo">
+                    </div>
+
+                    <!-- SOLD Overlay (conditionally rendered) -->
+<!--                    {% if page.sold %}-->
+<!--                        <div class="sold-overlay">SOLD</div>-->
+<!--                    {% endif %}-->
+                </div>
+            {% if current_user.is_admin %}
+             <div class="check-stock" id="check-stock-{{page.id}}">
+            {% if page.sold %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+               class="badge sold"><span>Sold</span></a>
+            {% elif page.reserved %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge reserved"><span>Reserved</span></a>
+            {% else %}
+            <a hx-get="{{ url_for('stock', index=page.id)}}"
+                  hx-target="#edit-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#edit-modal"
+                  data-url="{{ url_for('stock', index=page.id)}}"
+                  class="badge availability"><span>Available</span></a>
+            {% endif %}
+            </div>
+            <div class="edit-deleteone">
+            <a href="{{ url_for('edit', index=page.id, page=num ) }}" class="details-link"><span class="edit-deletetwo">edit <i class="bi bi-link-45deg"></i> </span></a>
+            <button
+                  class="btn btn-danger btn-sm"
+                  hx-get="{{ url_for('pre_delete', index=page.id)}}"
+                  hx-target="#delete-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#delete-modal"
+                  data-url="{{ url_for('pre_delete', index=page.id)}}">
+                  Delete
+                </button>
+<!--                <a href="{{ url_for('pre_delete', index=page.id)}}" class="details-link"><span class="edit-deletetwo">delete <i class="bi bi-x-circle-fill"></i> </span></a>-->
+            </div>
+            {% else %}
+            {% if page.sold %}
+            <span class="badge sold">Sold</span>
+            {% elif page.reserved %}
+            <span class="badge reserved">Reserved</span>
+            {% else %}
+            <span class="badge availability">Available</span>
+            {% endif %}
+            {%endif%}
+
+
+<!--            <div class="d-flex justify-content-between align-items-center mb-3 transparent-bg">-->
+<!--                    <div class="dealer-info">-->
+<!--                        <img src="static/assets/img/mushroom_logo.png" alt="Dealer Logo">-->
+<!--                        <span>Mushroom Motors</span>-->
+<!--                        <span class="badge verified">Verified Dealer</span>-->
+<!--                    </div>-->
+<!--            </div>-->
+            <div class="card-body card-body-standard">
+                <h5 class="card-title"><span class="badge bg-dark mb-4">{{page.model_year}}</span> <b>{{page.brand.capitalize()}} {{page.title.capitalize()}}</b></h5>
+                <div class="mb-3">
+                    <span class="badge bg-secondary">{{page.transmission}}</span>
+                    <span class="badge bg-secondary">{{page.engine_rating}}</span>
+                    <span class="badge bg-secondary">{{page.condition or 'N/A'}}</span>
+                </div>
+                <p class="card-text" >
+                    {{page.description or 'insert description here'}}
+                </p>
+            </div>
+                <div class="card-footer">
+                    <h6 class="card-subtitle mb-2 text-muted">Price: KES {{ page.price|number_format}}</h6>
+                    <a href="{{ url_for('blog_details', post_id=page.id) }}" class="btn md_contact">Contact Seller</a>
+                </div>
+
+
+        </div>
+                </a>
+    </div>
+            {% endif %}
+          {% endfor %}
+</div>
+      </div>
+    </section><!-- /Blog Posts Section -->
+
     </div>
 
   </main>

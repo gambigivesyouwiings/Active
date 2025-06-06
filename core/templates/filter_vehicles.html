@@ -6,12 +6,33 @@
 
          <div class="row gy-5">
 
+    <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h1 class="text-center mb-4">Vehicle Catalogue</h1>
+          <br>
+          <a href="#footer"> Showing page {{ pages.page }} out of {{ pages.pages }} total pages <i class="bi bi-arrow-down"></i></a>
+<!--        <a href="{{url_for('blog')}}"> Displaying posts {{ pages.first }} - {{ pages.last }} of {{ pages.total }} <br><i class="bi bi-star"></i> </a> <br>-->
+      </div><!-- End Section Title -->
+
+
           {% for page in pages %}
         <div id="vehicle-{{ page.id }}" class="col-lg-4 col-md-6 mt-5">
             <a href="{{ url_for('blog_details', post_id=page.id) }}">
         <div class="card card-standard">
             {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
             <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">
+            <!-- Overlay Div -->
+                <div class="image-overlay">
+                    <!-- Dealer Logo -->
+                    <div class="dealer-logo">
+                        <img src="{{ url_for('static', filename='assets/img/modern_mushroom.jpeg') }}" alt="Dealer Logo">
+                    </div>
+
+                    <!-- SOLD Overlay (conditionally rendered) -->
+<!--                    {% if page.sold %}-->
+<!--                        <div class="sold-overlay">SOLD</div>-->
+<!--                    {% endif %}-->
+                </div>
             {% if current_user.is_admin %}
              <div class="check-stock" id="check-stock-{{page.id}}">
             {% if page.sold %}

@@ -2167,6 +2167,70 @@ visibility: hidden;
   }
 }
 
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.gallery-item img {
+  transition: 0.3s;
+}
+
+.gallery-links {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: all ease-in-out 0.3s;
+  z-index: 3;
+}
+
+.bi-play-btn {
+opacity: 1;
+}
+
+.gallery-links .preview-link,
+.gallery-links .details-link {
+  font-size: 60px;
+  color: color-mix(in srgb, var(--accent-color), transparent 30%);
+  transition: 0.3s;
+  line-height: 4.2;
+  margin: 30px 8px 0 8px;
+}
+
+.gallery-links .preview-link:hover,
+.gallery-links .details-link:hover {
+  color: #fff;
+}
+
+.gallery-links .details-link {
+  font-size: 30px;
+  line-height: 0;
+}
+
+.gallery-item:hover .gallery-links {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.gallery-item:hover .preview-link,
+.gallery-item:hover .details-link {
+  margin-top: 0;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+.glightbox-clean .gslide-description {
+  background: #222425;
+}
+
+.glightbox-clean .gslide-title {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
 /*--------------------------------------------------------------
 # Blog Posts 2 Section
 --------------------------------------------------------------*/
@@ -2204,6 +2268,7 @@ overflow: hidden;
 
 .card-text {
 color: black;
+font-family: 'Montserrat', sans-serif;font-optical-sizing: auto; font-weight: 500; font-size: 16px; font-style: normal;
 display: -webkit-box;
 -webkit-line-clamp: 3; /* Number of lines */
 -webkit-box-orient: vertical;
@@ -2226,6 +2291,56 @@ font-size: 1em;
     padding: 10px; /* Add spacing inside the div */
     border-radius: 0; /* No rounding to match card edges */
 }
+
+/* CSS for the image container to enable positioning of overlays */
+.blog-img {
+    position: relative; /* Needed for absolute positioning of overlays */
+    overflow: hidden; /* Hide overflowing diagonal strip */
+}
+
+/* CSS for the overlay div */
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    background-color: rgba(255, 255, 255, 0.1); /* Transparent white background */
+    z-index: 1; /* Place above the image */
+}
+
+/* CSS for the dealer logo within the overlay */
+.image-overlay .dealer-logo {
+    display: flex;
+    position: relative;
+    top: 75%;/* Adjust as needed */
+     /* Adjust as needed */
+    align-items: center;
+    justify-content: center;
+    z-index: 2; /* Place above the transparent overlay */
+}
+
+.image-overlay .dealer-logo img {
+    width: 50px; /* Adjust as needed */
+    height: auto;
+    opacity: 0.6;
+}
+
+/* CSS for the "SOLD" diagonal strip within the overlay */
+.image-overlay .sold-overlay {
+    position: relative;
+    text-align: center;
+    top: 40%; /* Adjust as needed */
+    right: 0px; /* Adjust as needed to position the strip */
+    transform: rotate(-35deg); /* Rotate for diagonal effect */
+    background-color: rgba(255, 0, 0, 0.4); /* Red background for the strip */
+    color: white; /* White text */
+    padding: 5px 30px; /* Padding around the text */
+    font-weight: bold;
+    text-transform: uppercase;
+    z-index: 3; /* Place above everything else */
+}
+
 
 .badge {
      margin-right: 5px; /* Adds spacing between badges */
@@ -2259,6 +2374,7 @@ top: 20px;
 padding:3%;
 font-size: 0.85rem;
 color: black;
+z-index: 1;
 }
 
 .sold {
@@ -2269,6 +2385,7 @@ top: 20px;
 padding:3%;
 font-size: 1.0rem;
 color: black;
+z-index: 1;
 background-color: color-mix(in srgb, red, transparent 30%) !important
 }
 
@@ -2281,6 +2398,7 @@ padding:3%;
 font-size: 0.85rem;
 background-color: color-mix(in srgb, grey, transparent 30%);
 color: black;
+z-index: 1;
 }
 
  .edit-deleteone {
@@ -2291,7 +2409,8 @@ padding: 1%;
 top: 20px;
 background-color: color-mix(in srgb, var(--default-color), transparent 30%);
 color: black;
-font-size: 0.85rem
+font-size: 0.85rem;
+z-index: 1;
 }
 
  .edit-deletetwo {

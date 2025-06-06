@@ -93,36 +93,183 @@
         </nav>
       </div>
     </div><!-- End Page Title -->
-    <!-- About Section -->
-    <section id="about" class="about section">
+       <!-- Services Section -->
+    <section id="services" class="services section ">
 
       <div class="container">
-        <div class="row justify-content-between">
-          <div class="col-lg-4 order-lg-1" style="font-size:1.2rem">
-            <span class="section-subtitle" data-aos="fade-up">Welcome</span>
-            <h1 class="mb-4 mt-2" data-aos="fade-up">
-              Our Services:
-            </h1>
-            <p data-aos="fade-up">
-              From the best deals on the latest wheels, to vehicle trade-in and auto services.
-              We cater for all your car needs, from a sporty Benz down to a simple oil change.
-            </p>
-              <ul>
-                  <li>Import on behalf</li>
-                  <li>Wheel Alignment</li>
-                  <li>Car Servicing</li>
-                  <li>Car wash & waxing</li>
-              </ul>
-            <p class="mt-5" data-aos="fade-up">
-              <a href="url_for('contact')" class="btn btn-get-started">Get Started</a>
-            </p>
+        <div class="row gy-4 justify-content-center">
+
+          <div class="col-lg-3">
+            <div class="services-item" data-aos="fade-up">
+              <div class="services-icon">
+                <i class="bi bi-bullseye"></i>
+              </div>
+              <div>
+                <h3>Marketplace</h3>
+                <p>All of your dream cars in one place</p>
+              </div>
+            </div>
           </div>
-          <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2" data-aos="fade-up" data-aos-delay="100">
-                          <div class="swiper init-swiper">
+
+          <div class="col-lg-3">
+            <div class="services-item" data-aos="fade-up" data-aos-delay="100">
+              <div class="services-icon">
+                <i class="bi bi-command"></i>
+              </div>
+              <div>
+                <h3>Import Services</h3>
+                <p>We bring the best from overseas.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-3">
+            <div class="services-item" data-aos="fade-up" data-aos-delay="100">
+              <div class="services-icon">
+                <i class="bi bi-bullseye"></i>
+              </div>
+              <div>
+                <h3>Servicing & wheel alignment</h3>
+                <p>Keep your wheels tight and the car will be right.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section><!-- /Services Section -->
+
+    <!-- Stats Section -->
+    <section id="stats" class="stats section">
+
+      <div class="container">
+
+        <div class="row gy-4 justify-content-center">
+
+          <div class="col-lg-5">
+            <div class="images-overlap">
+              <img src="/static/assets/img/img_v_1.jpg" alt="student" class="img-fluid img-1" data-aos="fade-up" loading="lazy">
+            </div>
+          </div>
+
+          <div class="col-lg-4 ps-lg-5">
+
+            <h2 class="content-title">We value your time</h2>
+            <span class="content-subtitle">Why Us</span>
+            <p class="lead">
+              You order, we deliver. That is our motto. No ifs, buts and maybes
+            </p>
+            <p class="mb-5">
+              Mushroom motors builds its business on customer trust and confidence.
+            </p>
+            <div class="row mb-5 count-numbers">
+
+              <!-- Start Stats Item -->
+              <div class="col-4 counter" data-aos="fade-up" data-aos-delay="100">
+                <span data-purecounter-separator="true" data-purecounter-start="0" data-purecounter-end="{{total}}" data-purecounter-duration="1" class="purecounter number"></span>
+                <span class="d-block">New Imports</span>
+              </div>
+              <!-- End Stats Item -->
+
+              <!-- Start Stats Item -->
+              <div class="col-4 counter" data-aos="fade-up" data-aos-delay="200">
+                <span data-purecounter-separator="true" data-purecounter-start="0" data-purecounter-end="{{sold}}" data-purecounter-duration="1" class="purecounter number"></span>
+                <span class="d-block">Sold</span>
+              </div>
+              <!-- End Stats Item -->
+
+              <!-- Start Stats Item -->
+              <div class="col-4 counter" data-aos="fade-up" data-aos-delay="300">
+                <span data-purecounter-separator="true" data-purecounter-start="0" data-purecounter-end="{{suv}}" data-purecounter-duration="1" class="purecounter number"></span>
+                <span class="d-block">SUVs</span>
+              </div>
+              <!-- End Stats Item -->
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- /Stats Section -->
+
+    <!-- Tabs Section -->
+    <section id="tabs" class="tabs section light-background">
+      <!-- Section Title -->
+      <div class="container section-title mb-4" data-aos="fade-up">
+        <h1 class="text-center mb-3">Our Services</h1>
+          <br>
+          <a href="#tabs"> We offer: <i class="bi bi-arrow-down"></i> </a>
+      </div><!-- End Section Title -->
+      <div class="container">
+        <div class="row gap-x-lg-4 justify-content-between">
+          <div class="col-lg-4 js-custom-dots">
+            <a href="#" class="service-item link horizontal d-flex active" data-aos="fade-left" data-aos-delay="0">
+              <div class="service-icon color-1 mb-4">
+                <i class="bi bi-alarm"></i>
+              </div>
+              <!-- /.icon -->
+              <div class="service-contents">
+                <h3>Cleaning & Maintenance</h3>
+                  <p>Car wash & waxing. Tyre alignment. Servicing</p>
+              </div>
+              <!-- /.service-contents-->
+            </a>
+            <!-- /.service -->
+
+            <a href="#" class="service-item link horizontal d-flex" data-aos="fade-left" data-aos-delay="100">
+              <div class="service-icon color-2 mb-4">
+                <i class="bi bi-bag-check"></i>
+              </div>
+              <!-- /.icon -->
+              <div class="service-contents">
+                <h3>Trade-in</h3>
+                <p>
+                  Get a fair valuation at Mushroom motors to fund your next purchase.
+                </p>
+              </div>
+              <!-- /.service-contents-->
+            </a>
+            <!-- /.service -->
+
+            <a href="#" class="service-item link horizontal d-flex" data-aos="fade-left" data-aos-delay="200">
+              <div class="service-icon color-3 mb-4">
+                <i class="bi bi-briefcase"></i>
+              </div>
+              <!-- /.icon -->
+              <div class="service-contents">
+                <h3>Import Services</h3>
+                <p>
+                  We help you bring the best from overseas, and guide you through the process step-by-step.
+                </p>
+              </div>
+              <!-- /.service-contents-->
+            </a>
+            <!-- /.service -->
+
+            <a href="#" class="service-item link horizontal d-flex" data-aos="fade-left" data-aos-delay="300">
+              <div class="service-icon color-4 mb-4">
+                <i class="bi bi-easel"></i>
+              </div>
+              <!-- /.icon -->
+              <div class="service-contents">
+                <h3>Marketplace</h3>
+                <p>
+                  We offer the best deals in town. Get your dream car at premium comfort and luxury.
+                </p>
+              </div>
+              <!-- /.service-contents-->
+            </a>
+            <!-- /.service -->
+          </div>
+
+          <div class="col-lg-8">
+            <div class="swiper init-swiper-tabs">
               <script type="application/json" class="swiper-config">
                 {
                   "loop": true,
                   "speed": 600,
+                  "autoHeight": true,
                   "autoplay": {
                     "delay": 5000
                   },
@@ -146,186 +293,53 @@
               </script>
               <div class="swiper-wrapper">
                 <div class="swiper-slide">
-<blockquote
-  class="instagram-media"
-  data-instgrm-permalink="https://www.instagram.com/reel/DI3Av-YNxTL/?utm_source=ig_embed&amp;utm_campaign=loading"
-  data-instgrm-version="14"
-  style="
-    background: #000 !important;
-    border: 0;
-    border-radius: 3px;
-    box-shadow:
-      0 0 1px 0 rgba(0, 0, 0, 0.5),
-      0 1px 10px 0 rgba(0, 0, 0, 0.5);
-    margin: 1px;
-    max-width: 540px;
-    min-width: 326px;
-    width: calc(100% - 2px);
-    padding: 0;
-  "
->
-  <div style="padding: 16px;">
-    <a
-      href="https://www.instagram.com/reel/DI3Av-YNxTL/?utm_source=ig_embed&amp;utm_campaign=loading"
-      target="_blank"
-      style="
-        display: flex;
-        align-items: center;
-        background: transparent !important;
-        color: #fff !important;
-        text-decoration: none;
-        width: 100%;
-        line-height: 0;
-      "
-    >
-      <div
-        style="
-          background-color: #333;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          flex-shrink: 0;
-          margin-right: 14px;
-        "
-      ></div>
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          flex-grow: 1;
-        "
-      >
-        <div
-          style="
-            background-color: #333;
-            border-radius: 4px;
-            height: 14px;
-            width: 100px;
-            margin-bottom: 6px;
-          "
-        ></div>
-        <div
-          style="
-            background-color: #333;
-            border-radius: 4px;
-            height: 14px;
-            width: 60px;
-          "
-        ></div>
-      </div>
-    </a>
-    <p
-      style="
-        color: #fff !important;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        line-height: 17px;
-        margin: 8px 0 0;
-        padding: 8px 0 7px;
-        text-align: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      "
-    >
-      <a
-        href="https://www.instagram.com/reel/DI3Av-YNxTL/?utm_source=ig_embed&amp;utm_campaign=loading"
-        target="_blank"
-        style="
-          color: #fff !important;
-          font-family: Arial, sans-serif;
-          font-size: 14px;
-          line-height: 17px;
-          text-decoration: none;
-        "
-      >
-        A post shared by PIXL CVLTVRE (@pixl_cvltvre)
-      </a>
-    </p>
-  </div>
-</blockquote>
-<script async src="//www.instagram.com/embed.js"></script>
-                </div>
+                  <div class="gallery-item h-100">
+                  <img src="/static/assets/img/masonry-portfolio/carwashpic.jpg" alt="Image" class="img-fluid">
+              <div class="gallery-links d-flex align-items-center justify-content-center">
+                  <a href="{{ url_for('static', filename='assets/img/portfolio/carwash.mp4') }}" title="Cleaning Services" class="glightbox preview-link"><i class="bi bi-play-btn"></i></a>
               </div>
-              <div class="swiper-pagination"></div>
+
             </div>
-          </div>
-        </div>
-      </div>
-    </section><!-- /About Section -->
-    <!-- Services 2 Section -->
-    <section id="services-2" class="services-2 section light-background">
-
-      <div class="container">
-        <div class="row justify-content-center" data-aos="fade-up" style="font-size:1.2rem">
-          <div class="col-md-4 col-lg-4">
-            <span class="content-subtitle">Our Motto</span>
-            <h2 class="content-title">
-              You order, We deliver.
-            </h2>
-            <p class="lead">
-               From the best deals on the latest wheels, to vehicle trade-in and auto services.
-              We cater for all your car needs, from a sporty Benz down to a simple oil change.
-
-            </p>
-            <p class="mb-5">
-              Go Vroom Vroom..... With Mushroom!
-            </p>
-
-          </div>
-          <div class="col-md-6 col-lg-6 ps-lg-5">
-            <div class="row">
-              <div class="col-6 col-sm-6 col-md-6 col-lg-6">
-                <div class="services-item" data-aos="fade-up" data-aos-delay="100">
-                  <div class="services-icon">
-                    <i class="bi bi-search"></i>
-                  </div>
-                  <div>
-                    <h3>Search</h3>
-                    <p>For all your dream cars or just curiosity</p>
-                  </div>
                 </div>
-              </div>
-              <div class="col-6 col-sm-6 col-md-6 col-lg-6">
-                <div class="services-item" data-aos="fade-up" data-aos-delay="100">
-                  <div class="services-icon">
-                    <i class="bi bi-command"></i>
-                  </div>
-                  <div>
-                    <h3>Import Services</h3>
-                    <p>We handle car Imports for you.</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6 col-sm-6 col-md-6 col-lg-6">
-                <div class="services-item" data-aos="fade-up" data-aos-delay="100">
-                  <div class="services-icon">
-                    <i class="bi bi-grid"></i>
-                  </div>
-                  <div>
-                    <h3>Auto car Servicing</h3>
-                    <p>Keep the wheels tight and the car will be right</p>
-                  </div>
-                </div>
-              </div>
+                <div class="swiper-slide">
+                    <div class="gallery-item h-100">
+                        <img src="/static/assets/img/masonry-portfolio/rrresize.jpg" alt="Image" class="img-fluid">
+                        <div class="gallery-links d-flex align-items-center justify-content-center">
+                            <a href="{{ url_for('static', filename='assets/img/portfolio/rover_1.mp4') }}" title="trade-in" class="glightbox preview-link"><i class="bi bi-play-btn"></i></a>
+                        </div>
 
-              <div class="col-6 col-sm-6 col-md-6 col-lg-6">
-                <div class="services-item" data-aos="fade-up" data-aos-delay="100">
-                  <div class="services-icon">
-                    <i class="bi bi-globe"></i>
-                  </div>
-                  <div>
-                    <h3>Online Marketplace</h3>
-                    <p>Buy and sell Cars all in one place.</p>
-                  </div>
+                    </div>
                 </div>
+                <div class="swiper-slide">
+                    <div class="gallery-item h-100">
+                        <img src="/static/assets/img/masonry-portfolio/benzz.jpg" alt="Image" class="img-fluid">
+                        <div class="gallery-links d-flex align-items-center justify-content-center">
+                            <a href="{{ url_for('static', filename='assets/img/portfolio/import.mp4') }}" title="Import services" class="glightbox preview-link"><i class="bi bi-play-btn"></i></a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="gallery-item h-100">
+                        <img src="/static/assets/img/masonry-portfolio/lexuss.jpg" alt="Image" class="img-fluid">
+                        <div class="gallery-links d-flex align-items-center justify-content-center">
+                            <a href="{{ url_for('static', filename='assets/img/portfolio/lexus.mp4') }}" title="Comfort & Luxury" class="glightbox preview-link"><i class="bi bi-play-btn"></i></a>
+                        </div>
+
+                    </div>
+                </div>
+<!--                <div class="swiper-slide">-->
+<!--                  <img src="/static/assets/img/img_h_3.jpg" alt="Image" class="img-fluid">-->
+<!--                </div>-->
+<!--                <div class="swiper-slide">-->
+<!--                  <img src="/static/assets/img/img_h_4.jpg" alt="Image" class="img-fluid">-->
+<!--                </div>-->
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section><!-- /Services 2 Section -->
+    </section><!-- /Tabs Section -->
 
 <!--    &lt;!&ndash; Services Section &ndash;&gt;-->
 <!--    <section id="services" class="services section light-background">-->

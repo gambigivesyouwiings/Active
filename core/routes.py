@@ -18,6 +18,7 @@ from werkzeug.utils import secure_filename
 import re
 import json
 import uuid
+from google import genai
 
 
 def create_app():
@@ -107,6 +108,20 @@ def super_admin_only(f):
     return wrapper
 
 
+def getai(user_message):
+    key = os.getenv("GEMINI")
+    client = genai.Client(api_key=key)
+    # Send to Gemini
+    prompt = "Write a short paragraph summary of the following vehicle with the attached features.It's not a must to mention all of them, just pick and choose what you deem is relevant. Tailor it for a car website audience in a documentary-like tone."
+    full_prompt = f"{prompt}\n\nVehicle features: {user_message}"
+    response = client.models.generate_content(model="gemini-2.0-flash", contents=full_prompt)
+
+    # return jsonify({
+    #     'response': response.text
+    # })
+    return response.text
+
+
 @app.template_filter('number_format')
 def number_format(value):
     return f"{int(value):,}"
@@ -193,8 +208,11 @@ def home():
         vehicles = query.paginate(page=page, per_page=per_page)
         return render_template("blog.html", num=page, admin_list=admin_list, pages=vehicles, brands=unique,
                                csrf_token=generate_csrf())
-    last_six_entries = Catalogue.query.order_by(Catalogue.id.desc()).limit(6).all()
-    return render_template("index.html", admin_list=admin_list, csrf_token=generate_csrf(), brands=unique,
+    last_six_entries = Catalogue.query.order_by(Catalogue.sold).order_by(Catalogue.id.desc()).limit(6).all()
+    total_vehicles = Catalogue.query.count() + 30
+    trucks = Catalogue.query.filter(Catalogue.vehicle_type == "SUV").count()
+    sold = Catalogue.query.filter(Catalogue.sold).count() + 10
+    return render_template("index.html", trucks=trucks, total=total_vehicles, sold=sold, admin_list=admin_list, csrf_token=generate_csrf(), brands=unique,
                            pages=last_six_entries)
 
 
@@ -217,7 +235,10 @@ def contact():
 def services():
     obj = time.localtime()
     t = time.asctime(obj)
-    return render_template("services.html", time=t)
+    total_vehicles = Catalogue.query.count() + 30
+    trucks = Catalogue.query.filter(Catalogue.vehicle_type == "SUV").count()
+    sold = Catalogue.query.filter(Catalogue.sold).count() + 10
+    return render_template("services.html", total=total_vehicles, suv=trucks, sold=sold, time=t)
 
 
 @app.route("/mportfolio")
@@ -339,7 +360,7 @@ def blog():
         return render_template("blog.html", num=page, admin_list=admin_list, pages=pages, brands=unique,
                                csrf_token=generate_csrf())
 
-    pages = db.paginate(db.select(Catalogue).order_by(desc(Catalogue.id)), page=page, per_page=per_page)
+    pages = db.paginate(db.select(Catalogue).order_by(Catalogue.sold).order_by(desc(Catalogue.id)), page=page, per_page=per_page)
     return render_template("blog.html", num=page, pages=pages, admin_list=admin_list, brands=unique,
                            csrf_token=generate_csrf())
 
@@ -357,7 +378,7 @@ def get_quote():
 @app.route("/vehicle_details/<int:post_id>")
 def blog_details(post_id):
     try:
-        post = db.session.query(Catalogue).filter_by(id=post_id).first()
+        post = Catalogue.query.get_or_404(post_id)
     except ProgrammingError:
         images = []
     else:
@@ -398,7 +419,9 @@ def blog_details(post_id):
 
     phone_number = "+254732252382"
 
-    return render_template("blog-details.html", phone_number=phone_number, features=features_data,
+    similar_six_entries = Catalogue.query.filter(Catalogue.vehicle_type.ilike(f"%{post.title}%") | Catalogue.brand.ilike(f"%{post.brand}%") | and_(Catalogue.price >= post.price - 1000000, Catalogue.price <= post.price + 1000000)).limit(6).all()
+
+    return render_template("blog-details.html", pages=similar_six_entries, phone_number=phone_number, features=features_data,
                            images=images, post=post, price=price, csrf_token=generate_csrf())
 
 
@@ -552,6 +575,24 @@ def upload():
 
         extras = json.dumps(features)  # Serialize the dictionary to JSON
 
+        content = {'brand': form.brand.data,
+        'vehicle_type':form.vehicle_type.data,
+        'model_year':form.model_year.data,
+        'engine_rating':form.engine_rating.data,
+        'fuel':form.fuel.data,
+        'transmission':form.transmission.data,
+        'mileage':form.mileage.data,
+        'drive_type':form.drive_type.data,
+        'extra_features':extras,
+        'availability':form.availability.data,
+        'condition': form.condition.data,
+        'model': form.model.data}
+
+        if form.ai.data:
+            description = getai(content)
+        else:
+            description = form.description.data
+
         save_post(
             img_url=f"{uploaded_files}",  # Pass the list of file paths as the image URLs
             brand=form.brand.data,
@@ -565,7 +606,7 @@ def upload():
             drive_type=form.drive_type.data,
             folder=f"/static/assets/cars/{new_name}",  # Using the brand as the folder name for simplicity
             extras=extras,
-            description=form.description.data,
+            description=f"{description}",
             availability=form.availability.data,  # This can be extended for user input or other logic
             condition=form.condition.data,
             user_id=current_user.id,
@@ -747,8 +788,7 @@ def edit(index):
 
         # Update vehicle details from form data
         for field in ['brand', 'vehicle_type', 'model_year', 'engine_rating',
-                      'price', 'mileage', 'fuel', 'transmission', 'drive_type', 'availability', 'condition',
-                      'description']:
+                      'price', 'mileage', 'fuel', 'transmission', 'drive_type', 'availability', 'condition']:
             setattr(vehicle, field, getattr(form, field).data)
 
         vehicle.title = form.model.data
@@ -788,6 +828,26 @@ def edit(index):
         }
 
         vehicle.extras = json.dumps(features)  # Serialize the dictionary to JSON
+
+        content = {'brand': form.brand.data,
+                   'vehicle_type': form.vehicle_type.data,
+                   'model_year': form.model_year.data,
+                   'engine_rating': form.engine_rating.data,
+                   'fuel': form.fuel.data,
+                   'transmission': form.transmission.data,
+                   'mileage': form.mileage.data,
+                   'drive_type': form.drive_type.data,
+                   'extra_features': features,
+                   'availability': form.availability.data,
+                   'condition': form.condition.data,
+                   'model': form.model.data}
+
+        if form.ai.data:
+            description = getai(content)
+        else:
+            description = form.description.data
+
+        vehicle.description = description
 
         # Process thumbnail assignment first
         thumbnail_image_id = request.form.get("thumbnail_image")  # Thumbnail index (optional)

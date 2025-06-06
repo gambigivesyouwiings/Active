@@ -290,7 +290,15 @@
     </div>
 
     {{ wtf.form_field(form.file) }}
-    {{ wtf.form_field(form.description) }}
+
+    <div class="row">
+        <div class="col-md-9">
+            {{ wtf.form_field(form.description) }}
+        </div>
+        <div class="col-md-2">
+            {{ wtf.form_field(form.ai) }}
+        </div>
+    </div>
     {{ form.submit(class="btn btn-primary") }}
 <!--    {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}-->
 </form>

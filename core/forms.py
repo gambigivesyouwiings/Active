@@ -76,7 +76,8 @@ class CreatePostForm(FlaskForm):
         ],
         default='Foreign used'  # Set the default selected value
     )
-    description = CKEditorField("Short Description of the car", validators=[DataRequired()])
+    description = CKEditorField("Write a short description of the car, or tick box to auto-generate")
+    ai = BooleanField("AI generated description")
 
     # Comfort Features
     sunroof = BooleanField('Sunroof')
@@ -205,7 +206,8 @@ class EditForm(FlaskForm):
         ],
         default='Foreign used'  # Set the default selected value
     )
-    description = CKEditorField("Short Description of the car", validators=[DataRequired()])
+    description = CKEditorField("Write a short description of the car, or tick box to auto-generate")
+    ai = BooleanField("AI generated description")
 
     # Comfort Features
     sunroof = BooleanField('Sunroof')
