@@ -2,7 +2,7 @@ from flask import render_template, request, abort, redirect, url_for, flash, mak
 from flask_wtf.csrf import CSRFError, generate_csrf
 from core import app, db, login_manager, send_email, generate_token, confirm_token
 from core.models import Catalogue, Users
-from core.forms import CreatePostForm, RegisterForm, LoginForm, EditForm, EditProfileForm
+from core.forms import PostForm, RegisterForm, LoginForm, PostEditForm, EditProfileForm, CreatePostForm
 import time
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy import desc, or_, and_
@@ -212,7 +212,8 @@ def home():
     total_vehicles = Catalogue.query.count() + 30
     trucks = Catalogue.query.filter(Catalogue.vehicle_type == "SUV").count()
     sold = Catalogue.query.filter(Catalogue.sold).count() + 10
-    return render_template("index.html", trucks=trucks, total=total_vehicles, sold=sold, admin_list=admin_list, csrf_token=generate_csrf(), brands=unique,
+    return render_template("index.html", trucks=trucks, total=total_vehicles, sold=sold, admin_list=admin_list,
+                           csrf_token=generate_csrf(), brands=unique,
                            pages=last_six_entries)
 
 
@@ -364,7 +365,8 @@ def blog():
         return render_template("blog.html", num=page, admin_list=admin_list, pages=pages, brands=unique,
                                csrf_token=generate_csrf())
 
-    pages = db.paginate(db.select(Catalogue).order_by(Catalogue.sold).order_by(desc(Catalogue.id)), page=page, per_page=per_page)
+    pages = db.paginate(db.select(Catalogue).order_by(Catalogue.sold).order_by(desc(Catalogue.id)), page=page,
+                        per_page=per_page)
     return render_template("blog.html", num=page, pages=pages, admin_list=admin_list, brands=unique,
                            csrf_token=generate_csrf())
 
@@ -423,9 +425,12 @@ def blog_details(post_id):
 
     phone_number = "+254732252382"
 
-    similar_six_entries = Catalogue.query.filter(Catalogue.vehicle_type.ilike(f"%{post.title}%") | Catalogue.brand.ilike(f"%{post.brand}%") | and_(Catalogue.price >= post.price - 1000000, Catalogue.price <= post.price + 1000000)).limit(6).all()
+    similar_six_entries = Catalogue.query.filter(
+        Catalogue.vehicle_type.ilike(f"%{post.title}%") | Catalogue.brand.ilike(f"%{post.brand}%") | and_(
+            Catalogue.price >= post.price - 1000000, Catalogue.price <= post.price + 1000000)).limit(6).all()
 
-    return render_template("blog-details.html", pages=similar_six_entries, phone_number=phone_number, features=features_data,
+    return render_template("blog-details.html", pages=similar_six_entries, phone_number=phone_number,
+                           features=features_data,
                            images=images, post=post, price=price, csrf_token=generate_csrf())
 
 
@@ -523,9 +528,18 @@ def delete_vehicle(post_id):
 @app.route('/upload', methods=['GET', 'POST'])
 @admin_only
 def upload():
-    form = CreatePostForm()
+    form = PostForm()
 
     if form.validate_on_submit():
+        # # --- MANUAL CHECK ---
+        # if not form.file.data:
+        #     flash("Please select at least one image to upload.", "error")
+        #     # If the check fails on an AJAX request, return a JSON error
+        #     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        #         return jsonify({'status': 'error', 'errors': {'file': ['Please upload a file.']}}), 400
+        #     # For a standard submission, just re-render the form
+        #     return render_template('upload.html', form=form)
+        # # --- END OF MANUAL CHECK ---
         profile = Users.query.get_or_404(current_user.id)
         if profile.posts_made:
             profile.posts_made += 1
@@ -542,7 +556,7 @@ def upload():
             print(f"Error creating directory: {e}")
         # files = request.files.getlist(form.file)  # Fetch all uploaded files
 
-        for file in form.file.data:
+        for key, file in request.files.items():
             # Process each file (e.g., save to a directory)
             file_name = secure_filename(file.filename)
             unique_filename = generate_unique_filename(destination, file_name)
@@ -552,45 +566,91 @@ def upload():
 
         features = {
             'comfort': {
-                'sunroof': form.sunroof.data,
-                'trimming': form.trimming.data,
-                'heated_seats': form.heated_seats.data,
-                'sound_system': form.sound_system.data,
-                'power_windows': form.power_windows.data,
-                'seat_material': form.seat_material.data,
-                'air_conditioning': form.air_conditioning.data,
-                'powered_tailgate': form.powered_tailgate.data,
-                'phone_connectivity': form.phone_connectivity.data,
-                'auto_start_stop': form.auto_start_stop.data,
+                'sunroof': form.comfort_interior.sunroof.data,
+                'trimming': form.comfort_interior.trimming.data,
+                'heated_seats': form.comfort_interior.heated_seats.data,
+                'sound_system': form.comfort_interior.sound_system.data,
+                'power_windows': form.comfort_interior.power_windows.data,
+                'seat_material': form.comfort_interior.seat_material.data,
+                'air_conditioning': form.comfort_interior.air_conditioning.data,
+                'powered_tailgate': form.comfort_interior.powered_tailgate.data,
+                'phone_connectivity': form.comfort_interior.phone_connectivity.data,
+                # This is now the broader smartphone integration
+                'auto_start_stop': form.comfort_interior.auto_start_stop.data,
+                'ventilated_seats': form.comfort_interior.ventilated_seats.data,
+                'memory_seats': form.comfort_interior.memory_seats.data,
+                'power_adjustable_seats': form.comfort_interior.power_adjustable_seats.data,
+                'dual_zone_climate_control': form.comfort_interior.dual_zone_climate_control.data,
+                'rear_air_conditioning': form.comfort_interior.rear_air_conditioning.data,
+                'steering_wheel_controls': form.comfort_interior.steering_wheel_controls.data,
+                'heated_steering_wheel': form.comfort_interior.heated_steering_wheel.data,
+                'auto_dimming_mirrors': form.comfort_interior.auto_dimming_mirrors.data,
+                'rain_sensing_wipers': form.comfort_interior.rain_sensing_wipers.data,
+                'cargo_cover': form.comfort_interior.cargo_cover.data,
+                'split_folding_rear_seats': form.comfort_interior.split_folding_rear_seats.data,
+                'keyless_entry': form.comfort_interior.keyless_entry.data,
+                'push_button_start': form.comfort_interior.push_button_start.data,
+                'remote_start': form.comfort_interior.remote_start.data,
             },
             'safety': {
-                'srs_air_bags': form.srs_air_bags.data,
-                'lane_assistance': form.lane_assistance.data,
-                'hill_descent_control': form.hill_descent_control.data,
-                'roll_stability_control': form.roll_stability_control.data,
-                'standard_cruise_control': form.standard_cruise_control.data,
-                'adaptive_cruise_control': form.adaptive_cruise_control.data,
-                'antilock_braking_system': form.antilock_braking_system.data,
-                'emergency_braking_assist': form.emergency_braking_assist.data,
-                'immobilizer_and_anti_theft': form.immobilizer_and_anti_theft.data,
-                'electronic_stability_control': form.electronic_stability_control.data,
+                'srs_air_bags': form.safety_assistance.srs_air_bags.data,
+                'lane_assistance': form.safety_assistance.lane_assistance.data,
+                'hill_descent_control': form.safety_assistance.hill_descent_control.data,
+                'roll_stability_control': form.safety_assistance.roll_stability_control.data,
+                'standard_cruise_control': form.safety_assistance.standard_cruise_control.data,
+                'adaptive_cruise_control': form.safety_assistance.adaptive_cruise_control.data,
+                'antilock_braking_system': form.safety_assistance.antilock_braking_system.data,
+                'emergency_braking_assist': form.safety_assistance.emergency_braking_assist.data,
+                'immobilizer_and_anti_theft': form.safety_assistance.immobilizer_and_anti_theft.data,
+                'electronic_stability_control': form.safety_assistance.electronic_stability_control.data,
+                'rear_view_camera': form.safety_assistance.rear_view_camera.data,
+                'parking_sensors_front': form.safety_assistance.parking_sensors_front.data,
+                'parking_sensors_rear': form.safety_assistance.parking_sensors_rear.data,
+                'camera_360': form.safety_assistance.camera_360.data,  # Adjusted field name
+                'blind_spot_monitoring': form.safety_assistance.blind_spot_monitoring.data,
+                'rear_cross_traffic_alert': form.safety_assistance.rear_cross_traffic_alert.data,
+                'driver_attention_alert': form.safety_assistance.driver_attention_alert.data,
+                'traffic_sign_recognition': form.safety_assistance.traffic_sign_recognition.data,
+                'automatic_high_beams': form.safety_assistance.automatic_high_beams.data,
+                'tire_pressure_monitoring': form.safety_assistance.tire_pressure_monitoring.data,
+            },
+            'infotainment': {
+                'navigation_system': form.infotainment.navigation_system.data,
+                'bluetooth_connectivity': form.infotainment.bluetooth_connectivity.data,
+                'usb_ports': form.infotainment.usb_ports.data,
+                'wireless_charging': form.infotainment.wireless_charging.data,
+                'wi_fi_hotspot': form.infotainment.wi_fi_hotspot.data,
+            },
+            'exterior': {
+                'led_headlights': form.exterior.led_headlights.data,
+                'alloy_wheels': form.exterior.alloy_wheels.data,
+                'roof_rails': form.exterior.roof_rails.data,
+                'spoiler': form.exterior.spoiler.data,
+                'paint_color': form.exterior.paint_color.data,
+                'exterior_color_metallic': form.exterior.exterior_color_metallic.data,
+            },
+            'performance': {
+                'sport_suspension': form.performance.sport_suspension.data,
+                'selectable_drive_modes': form.performance.selectable_drive_modes.data,
+                'paddle_shifters': form.performance.paddle_shifters.data,
             }
         }
 
         extras = json.dumps(features)  # Serialize the dictionary to JSON
 
-        content = {'brand': form.brand.data,
-        'vehicle_type':form.vehicle_type.data,
-        'model_year':form.model_year.data,
-        'engine_rating':form.engine_rating.data,
-        'fuel':form.fuel.data,
-        'transmission':form.transmission.data,
-        'mileage':form.mileage.data,
-        'drive_type':form.drive_type.data,
-        'extra_features':extras,
-        'availability':form.availability.data,
-        'condition': form.condition.data,
-        'model': form.model.data}
+        content = {
+            'brand': form.vehicle_specs.brand.data,
+            'vehicle_type': form.vehicle_specs.vehicle_type.data,
+            'model_year': form.vehicle_specs.model_year.data,
+            'engine_rating': form.vehicle_specs.engine_rating.data,
+            'fuel': form.vehicle_specs.fuel.data,
+            'transmission': form.vehicle_specs.transmission.data,
+            'drive_type': form.vehicle_specs.drive_type.data,
+            'extra_features': extras,
+            'availability': form.vehicle_specs.availability.data,
+            'condition': form.vehicle_specs.condition.data,
+            'model': form.vehicle_specs.model.data
+        }
 
         if form.ai.data:
             description = getai(content)
@@ -598,27 +658,41 @@ def upload():
             description = form.description.data
 
         save_post(
-            img_url=f"{uploaded_files}",  # Pass the list of file paths as the image URLs
-            brand=form.brand.data,
-            vehicle_type=form.vehicle_type.data,
-            model_year=form.model_year.data,
-            engine_rating=form.engine_rating.data,
-            price=form.price.data,
-            fuel=form.fuel.data,
-            transmission=form.transmission.data,
-            mileage=form.mileage.data,
-            drive_type=form.drive_type.data,
-            folder=f"/static/assets/cars/{new_name}",  # Using the brand as the folder name for simplicity
+            img_url=f"{uploaded_files}",
+            brand=form.vehicle_specs.brand.data,
+            vehicle_type=form.vehicle_specs.vehicle_type.data,
+            model_year=form.vehicle_specs.model_year.data,
+            engine_rating=form.vehicle_specs.engine_rating.data,
+            price=form.vehicle_specs.price.data,
+            fuel=form.vehicle_specs.fuel.data,
+            transmission=form.vehicle_specs.transmission.data,
+            mileage=form.vehicle_specs.mileage.data,
+            drive_type=form.vehicle_specs.drive_type.data,
+            folder=f"/static/assets/cars/{new_name}",
             extras=extras,
             description=f"{description}",
-            availability=form.availability.data,  # This can be extended for user input or other logic
-            condition=form.condition.data,
+            availability=form.vehicle_specs.availability.data,
+            condition=form.vehicle_specs.condition.data,
             user_id=current_user.id,
-            title=f"{form.model.data}"  # Combine brand and model for the title
+            title=f"{form.vehicle_specs.model.data}"
+            # Combine brand and model for the title, accessed via vehicle_specs
         )
 
-        flash("Post created successfully!", "success")
-        return redirect(url_for('upload'))
+        # Check if the request was an AJAX call from Dropzone
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # For Dropzone, return a success JSON response
+            return jsonify({'status': 'success', 'message': 'Post created successfully!'}), 200
+        else:
+            # For a standard form submission, flash a message and redirect
+            flash("Post created successfully!", "success")
+            return redirect(url_for('upload'))
+
+    # This block runs if the form is loaded via GET or if validation fails on POST
+    else:
+        # If validation fails on an AJAX request, return the errors as JSON
+        if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Return a 400 Bad Request status with the form errors
+            return jsonify({'status': 'error', 'errors': form.errors}), 400
 
     return render_template('upload.html', form=form)
 
@@ -726,7 +800,7 @@ def edit_profile(index):
 @app.route("/edit-post/<int:index>", methods=["GET", "POST"])
 @admin_only
 def edit(index):
-    form = EditForm()
+    form = PostEditForm()
     vehicle = Catalogue.query.get_or_404(index)
     try:
         page = int(request.args.get('page', '1'))
@@ -745,44 +819,129 @@ def edit(index):
 
     # Populate form fields for GET requests
     if request.method == 'GET':
-        form.brand.data = vehicle.brand
-        form.model.data = vehicle.title
-        form.vehicle_type.data = vehicle.vehicle_type
-        form.model_year.data = vehicle.model_year
-        form.engine_rating.data = vehicle.engine_rating
-        form.price.data = vehicle.price
-        form.mileage.data = vehicle.mileage
-        form.fuel.data = vehicle.fuel
-        form.transmission.data = vehicle.transmission
-        form.drive_type.data = vehicle.drive_type
-        form.availability.data = vehicle.availability
-        form.condition.data = vehicle.condition or 'Foreign-used'
+        # Populate Vehicle Specifications sub-form
+        form.vehicle_specs.brand.data = vehicle.brand
+        form.vehicle_specs.model.data = vehicle.title  # Model is title in Catalogue
+        form.vehicle_specs.vehicle_type.data = vehicle.vehicle_type
+        form.vehicle_specs.model_year.data = vehicle.model_year
+        form.vehicle_specs.engine_rating.data = vehicle.engine_rating
+        form.vehicle_specs.price.data = vehicle.price
+        form.vehicle_specs.mileage.data = vehicle.mileage
+        form.vehicle_specs.fuel.data = vehicle.fuel
+        form.vehicle_specs.transmission.data = vehicle.transmission
+        form.vehicle_specs.drive_type.data = vehicle.drive_type
+        form.vehicle_specs.availability.data = vehicle.availability
+        form.vehicle_specs.condition.data = vehicle.condition or 'Foreign-used'
+
+        # Populate description fields (direct on form)
         form.description.data = vehicle.description or 'N/A'
+        # Assuming vehicle.ai exists or defaults to False
+        # If 'ai' is not stored in DB, it will always be unchecked unless default is set in form.
+        # form.ai.data = vehicle.ai # Uncomment if 'ai' status is stored in Catalogue
+
         if vehicle.extras:
             try:
                 features = json.loads(vehicle.extras)
-                if 'comfort' in features:
-                    form.sunroof.data = features['comfort'].get('sunroof')
-                    form.trimming.data = features['comfort'].get('trimming')
-                    form.heated_seats.data = features['comfort'].get('heated_seats')
-                    form.sound_system.data = features['comfort'].get('sound_system')
-                    form.power_windows.data = features['comfort'].get('power_windows')
-                    form.seat_material.data = features['comfort'].get('seat_material')
-                    form.air_conditioning.data = features['comfort'].get('air_conditioning')
-                    form.powered_tailgate.data = features['comfort'].get('powered_tailgate')
-                    form.phone_connectivity.data = features['comfort'].get('phone_connectivity')
-                    form.auto_start_stop.data = features['comfort'].get('auto_start_stop')
-                if 'safety' in features:
-                    form.srs_air_bags.data = features['safety'].get('srs_air_bags')
-                    form.lane_assistance.data = features['safety'].get('lane_assistance')
-                    form.hill_descent_control.data = features['safety'].get('hill_descent_control')
-                    form.roll_stability_control.data = features['safety'].get('roll_stability_control')
-                    form.standard_cruise_control.data = features['safety'].get('standard_cruise_control')
-                    form.adaptive_cruise_control.data = features['safety'].get('adaptive_cruise_control')
-                    form.antilock_braking_system.data = features['safety'].get('antilock_braking_system')
-                    form.emergency_braking_assist.data = features['safety'].get('emergency_braking_assist')
-                    form.immobilizer_and_anti_theft.data = features['safety'].get('immobilizer_and_anti_theft')
-                    form.electronic_stability_control.data = features['safety'].get('electronic_stability_control')
+
+                # Populate Comfort & Interior Features
+                if 'comfort' in features:  # Updated key name
+                    form.comfort_interior.sunroof.data = features['comfort'].get('sunroof')
+                    form.comfort_interior.trimming.data = features['comfort'].get('trimming')
+                    form.comfort_interior.heated_seats.data = features['comfort'].get('heated_seats')
+                    form.comfort_interior.sound_system.data = features['comfort'].get('sound_system')
+                    form.comfort_interior.power_windows.data = features['comfort'].get('power_windows')
+                    form.comfort_interior.seat_material.data = features['comfort'].get('seat_material')
+                    form.comfort_interior.air_conditioning.data = features['comfort'].get('air_conditioning')
+                    form.comfort_interior.powered_tailgate.data = features['comfort'].get('powered_tailgate')
+                    form.comfort_interior.phone_connectivity.data = features['comfort'].get(
+                        'phone_connectivity')
+                    form.comfort_interior.auto_start_stop.data = features['comfort'].get('auto_start_stop')
+                    form.comfort_interior.ventilated_seats.data = features['comfort'].get('ventilated_seats')
+                    form.comfort_interior.memory_seats.data = features['comfort'].get('memory_seats')
+                    form.comfort_interior.power_adjustable_seats.data = features['comfort'].get(
+                        'power_adjustable_seats')
+                    form.comfort_interior.dual_zone_climate_control.data = features['comfort'].get(
+                        'dual_zone_climate_control')
+                    form.comfort_interior.rear_air_conditioning.data = features['comfort'].get(
+                        'rear_air_conditioning')
+                    form.comfort_interior.steering_wheel_controls.data = features['comfort'].get(
+                        'steering_wheel_controls')
+                    form.comfort_interior.heated_steering_wheel.data = features['comfort'].get(
+                        'heated_steering_wheel')
+                    form.comfort_interior.auto_dimming_mirrors.data = features['comfort'].get(
+                        'auto_dimming_mirrors')
+                    form.comfort_interior.rain_sensing_wipers.data = features['comfort'].get(
+                        'rain_sensing_wipers')
+                    form.comfort_interior.cargo_cover.data = features['comfort'].get('cargo_cover')
+                    form.comfort_interior.split_folding_rear_seats.data = features['comfort'].get(
+                        'split_folding_rear_seats')
+                    form.comfort_interior.keyless_entry.data = features['comfort'].get('keyless_entry')
+                    form.comfort_interior.push_button_start.data = features['comfort'].get('push_button_start')
+                    form.comfort_interior.remote_start.data = features['comfort'].get('remote_start')
+
+                # Populate Safety & Driver Assistance
+                if 'safety' in features:  # Updated key name
+                    form.safety_assistance.srs_air_bags.data = features['safety'].get('srs_air_bags')
+                    form.safety_assistance.lane_assistance.data = features['safety'].get('lane_assistance')
+                    form.safety_assistance.hill_descent_control.data = features['safety'].get(
+                        'hill_descent_control')
+                    form.safety_assistance.roll_stability_control.data = features['safety'].get(
+                        'roll_stability_control')
+                    form.safety_assistance.standard_cruise_control.data = features['safety'].get(
+                        'standard_cruise_control')
+                    form.safety_assistance.adaptive_cruise_control.data = features['safety'].get(
+                        'adaptive_cruise_control')
+                    form.safety_assistance.antilock_braking_system.data = features['safety'].get(
+                        'antilock_braking_system')
+                    form.safety_assistance.emergency_braking_assist.data = features['safety'].get(
+                        'emergency_braking_assist')
+                    form.safety_assistance.immobilizer_and_anti_theft.data = features['safety'].get(
+                        'immobilizer_and_anti_theft')
+                    form.safety_assistance.electronic_stability_control.data = features['safety'].get(
+                        'electronic_stability_control')
+                    form.safety_assistance.rear_view_camera.data = features['safety'].get('rear_view_camera')
+                    form.safety_assistance.parking_sensors_front.data = features['safety'].get(
+                        'parking_sensors_front')
+                    form.safety_assistance.parking_sensors_rear.data = features['safety'].get(
+                        'parking_sensors_rear')
+                    form.safety_assistance.camera_360.data = features['safety'].get('camera_360')
+                    form.safety_assistance.blind_spot_monitoring.data = features['safety'].get(
+                        'blind_spot_monitoring')
+                    form.safety_assistance.rear_cross_traffic_alert.data = features['safety'].get(
+                        'rear_cross_traffic_alert')
+                    form.safety_assistance.driver_attention_alert.data = features['safety'].get(
+                        'driver_attention_alert')
+                    form.safety_assistance.traffic_sign_recognition.data = features['safety'].get(
+                        'traffic_sign_recognition')
+                    form.safety_assistance.automatic_high_beams.data = features['safety'].get(
+                        'automatic_high_beams')
+                    form.safety_assistance.tire_pressure_monitoring.data = features['safety'].get(
+                        'tire_pressure_monitoring')
+
+                # Populate Infotainment Features (NEW)
+                if 'infotainment' in features:
+                    form.infotainment.navigation_system.data = features['infotainment'].get('navigation_system')
+                    form.infotainment.bluetooth_connectivity.data = features['infotainment'].get(
+                        'bluetooth_connectivity')
+                    form.infotainment.usb_ports.data = features['infotainment'].get('usb_ports')
+                    form.infotainment.wireless_charging.data = features['infotainment'].get('wireless_charging')
+                    form.infotainment.wi_fi_hotspot.data = features['infotainment'].get('wi_fi_hotspot')
+
+                # Populate Exterior Features (NEW)
+                if 'exterior' in features:
+                    form.exterior.led_headlights.data = features['exterior'].get('led_headlights')
+                    form.exterior.alloy_wheels.data = features['exterior'].get('alloy_wheels')
+                    form.exterior.roof_rails.data = features['exterior'].get('roof_rails')
+                    form.exterior.spoiler.data = features['exterior'].get('spoiler')
+                    form.exterior.paint_color.data = features['exterior'].get('paint_color')
+                    form.exterior.exterior_color_metallic.data = features['exterior'].get('exterior_color_metallic')
+
+                # Populate Performance Features (NEW)
+                if 'performance' in features:
+                    form.performance.sport_suspension.data = features['performance'].get('sport_suspension')
+                    form.performance.selectable_drive_modes.data = features['performance'].get('selectable_drive_modes')
+                    form.performance.paddle_shifters.data = features['performance'].get('paddle_shifters')
+
             except json.JSONDecodeError:
                 flash("Error loading existing features.", "warning")
 
@@ -794,61 +953,123 @@ def edit(index):
         else:
             profile.edits = 1
 
-        # Update vehicle details from form data
-        for field in ['brand', 'vehicle_type', 'model_year', 'engine_rating',
-                      'price', 'mileage', 'fuel', 'transmission', 'drive_type', 'availability', 'condition']:
-            setattr(vehicle, field, getattr(form, field).data)
+        # Update vehicle details from vehicle_specs sub-form
+        vehicle.brand = form.vehicle_specs.brand.data
+        vehicle.vehicle_type = form.vehicle_specs.vehicle_type.data
+        vehicle.model_year = form.vehicle_specs.model_year.data
+        vehicle.engine_rating = form.vehicle_specs.engine_rating.data
+        vehicle.price = form.vehicle_specs.price.data
+        vehicle.mileage = form.vehicle_specs.mileage.data
+        vehicle.fuel = form.vehicle_specs.fuel.data
+        vehicle.transmission = form.vehicle_specs.transmission.data
+        vehicle.drive_type = form.vehicle_specs.drive_type.data
+        vehicle.availability = form.vehicle_specs.availability.data
+        vehicle.condition = form.vehicle_specs.condition.data
+        vehicle.title = form.vehicle_specs.model.data  # Update title from model data
 
-        vehicle.title = form.model.data
+        # Update description and AI flag (direct on form)
+        vehicle.description = form.description.data
+        # You might want to save form.ai.data to vehicle.ai if you have such a field in your model
+
         if form.stock.data == "sold":
             vehicle.sold = True
+            vehicle.reserved = False  # Ensure reserved is false if sold
         elif form.stock.data == "reserved":
             vehicle.reserved = True
-        else:
+            vehicle.sold = False  # Ensure sold is false if reserved
+        else:  # "available" or any other value
             vehicle.reserved = False
             vehicle.sold = False
 
+        # Construct the features dictionary from all sub-forms for serialization
         features = {
             'comfort': {
-                'sunroof': form.sunroof.data,
-                'trimming': form.trimming.data,
-                'heated_seats': form.heated_seats.data,
-                'sound_system': form.sound_system.data,
-                'power_windows': form.power_windows.data,
-                'seat_material': form.seat_material.data,
-                'air_conditioning': form.air_conditioning.data,
-                'powered_tailgate': form.powered_tailgate.data,
-                'phone_connectivity': form.phone_connectivity.data,
-                'auto_start_stop': form.auto_start_stop.data,
+                'sunroof': form.comfort_interior.sunroof.data,
+                'trimming': form.comfort_interior.trimming.data,
+                'heated_seats': form.comfort_interior.heated_seats.data,
+                'sound_system': form.comfort_interior.sound_system.data,
+                'power_windows': form.comfort_interior.power_windows.data,
+                'seat_material': form.comfort_interior.seat_material.data,
+                'air_conditioning': form.comfort_interior.air_conditioning.data,
+                'powered_tailgate': form.comfort_interior.powered_tailgate.data,
+                'phone_connectivity': form.comfort_interior.phone_connectivity.data,
+                'auto_start_stop': form.comfort_interior.auto_start_stop.data,
+                'ventilated_seats': form.comfort_interior.ventilated_seats.data,
+                'memory_seats': form.comfort_interior.memory_seats.data,
+                'power_adjustable_seats': form.comfort_interior.power_adjustable_seats.data,
+                'dual_zone_climate_control': form.comfort_interior.dual_zone_climate_control.data,
+                'rear_air_conditioning': form.comfort_interior.rear_air_conditioning.data,
+                'steering_wheel_controls': form.comfort_interior.steering_wheel_controls.data,
+                'heated_steering_wheel': form.comfort_interior.heated_steering_wheel.data,
+                'auto_dimming_mirrors': form.comfort_interior.auto_dimming_mirrors.data,
+                'rain_sensing_wipers': form.comfort_interior.rain_sensing_wipers.data,
+                'cargo_cover': form.comfort_interior.cargo_cover.data,
+                'split_folding_rear_seats': form.comfort_interior.split_folding_rear_seats.data,
+                'keyless_entry': form.comfort_interior.keyless_entry.data,
+                'push_button_start': form.comfort_interior.push_button_start.data,
+                'remote_start': form.comfort_interior.remote_start.data,
             },
-            'safety': {
-                'srs_air_bags': form.srs_air_bags.data,
-                'lane_assistance': form.lane_assistance.data,
-                'hill_descent_control': form.hill_descent_control.data,
-                'roll_stability_control': form.roll_stability_control.data,
-                'standard_cruise_control': form.standard_cruise_control.data,
-                'adaptive_cruise_control': form.adaptive_cruise_control.data,
-                'antilock_braking_system': form.antilock_braking_system.data,
-                'emergency_braking_assist': form.emergency_braking_assist.data,
-                'immobilizer_and_anti_theft': form.immobilizer_and_anti_theft.data,
-                'electronic_stability_control': form.electronic_stability_control.data,
+            'safety_assistance': {
+                'srs_air_bags': form.safety_assistance.srs_air_bags.data,
+                'lane_assistance': form.safety_assistance.lane_assistance.data,
+                'hill_descent_control': form.safety_assistance.hill_descent_control.data,
+                'roll_stability_control': form.safety_assistance.roll_stability_control.data,
+                'standard_cruise_control': form.safety_assistance.standard_cruise_control.data,
+                'adaptive_cruise_control': form.safety_assistance.adaptive_cruise_control.data,
+                'antilock_braking_system': form.safety_assistance.antilock_braking_system.data,
+                'emergency_braking_assist': form.safety_assistance.emergency_braking_assist.data,
+                'immobilizer_and_anti_theft': form.safety_assistance.immobilizer_and_anti_theft.data,
+                'electronic_stability_control': form.safety_assistance.electronic_stability_control.data,
+                'rear_view_camera': form.safety_assistance.rear_view_camera.data,
+                'parking_sensors_front': form.safety_assistance.parking_sensors_front.data,
+                'parking_sensors_rear': form.safety_assistance.parking_sensors_rear.data,
+                'camera_360': form.safety_assistance.camera_360.data,
+                'blind_spot_monitoring': form.safety_assistance.blind_spot_monitoring.data,
+                'rear_cross_traffic_alert': form.safety_assistance.rear_cross_traffic_alert.data,
+                'driver_attention_alert': form.safety_assistance.driver_attention_alert.data,
+                'traffic_sign_recognition': form.safety_assistance.traffic_sign_recognition.data,
+                'automatic_high_beams': form.safety_assistance.automatic_high_beams.data,
+                'tire_pressure_monitoring': form.safety_assistance.tire_pressure_monitoring.data,
+            },
+            'infotainment': {
+                'navigation_system': form.infotainment.navigation_system.data,
+                'bluetooth_connectivity': form.infotainment.bluetooth_connectivity.data,
+                'usb_ports': form.infotainment.usb_ports.data,
+                'wireless_charging': form.infotainment.wireless_charging.data,
+                'wi_fi_hotspot': form.infotainment.wi_fi_hotspot.data,
+            },
+            'exterior': {
+                'led_headlights': form.exterior.led_headlights.data,
+                'alloy_wheels': form.exterior.alloy_wheels.data,
+                'roof_rails': form.exterior.roof_rails.data,
+                'spoiler': form.exterior.spoiler.data,
+                'paint_color': form.exterior.paint_color.data,
+                'exterior_color_metallic': form.exterior.exterior_color_metallic.data,
+            },
+            'performance': {
+                'sport_suspension': form.performance.sport_suspension.data,
+                'selectable_drive_modes': form.performance.selectable_drive_modes.data,
+                'paddle_shifters': form.performance.paddle_shifters.data,
             }
         }
 
         vehicle.extras = json.dumps(features)  # Serialize the dictionary to JSON
 
-        content = {'brand': form.brand.data,
-                   'vehicle_type': form.vehicle_type.data,
-                   'model_year': form.model_year.data,
-                   'engine_rating': form.engine_rating.data,
-                   'fuel': form.fuel.data,
-                   'transmission': form.transmission.data,
-                   'mileage': form.mileage.data,
-                   'drive_type': form.drive_type.data,
-                   'extra_features': features,
-                   'availability': form.availability.data,
-                   'condition': form.condition.data,
-                   'model': form.model.data}
+        # Update 'content' for getai function if needed
+        content = {
+            'brand': form.vehicle_specs.brand.data,
+            'vehicle_type': form.vehicle_specs.vehicle_type.data,
+            'model_year': form.vehicle_specs.model_year.data,
+            'engine_rating': form.vehicle_specs.engine_rating.data,
+            'fuel': form.vehicle_specs.fuel.data,
+            'transmission': form.vehicle_specs.transmission.data,
+            'mileage': form.vehicle_specs.mileage.data,
+            'drive_type': form.vehicle_specs.drive_type.data,
+            'extra_features': features,  # Pass the dictionary, not the JSON string, if getai expects it
+            'availability': form.vehicle_specs.availability.data,
+            'condition': form.vehicle_specs.condition.data,
+            'model': form.vehicle_specs.model.data  # Using model data for the model field
+        }
 
         if form.ai.data:
             description = getai(content)
@@ -894,7 +1115,7 @@ def edit(index):
                     unique_filename = generate_unique_filename(f"core/{folder}", file_name)
                     file_path = f'core/{folder.strip("/")}/{unique_filename}'
                     file.save(file_path)
-                    urls.append(file_name)
+                    urls.append(unique_filename)
 
         # Update vehicle image URLs
         vehicle.img_url = f"[{', '.join(urls)}]"

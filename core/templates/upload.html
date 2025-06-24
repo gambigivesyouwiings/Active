@@ -1,215 +1,725 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% include 'header.html' %}
 
+<!--<link href="/static/assets/css/dropzone.css" rel="stylesheet">-->
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+
 <style>
+    /* Modern UI Variable-based Theme */
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --background-color: #f8f9fa;
+        --surface-color: #ffffff;
+        --border-color: #dee2e6;
+        --text-color: #212529;
+        --border-radius: 0.5rem;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+        background-color: var(--background-color);
+    }
+
+    /* Main Form Container Card */
+    .form-container-card {
+        background-color: var(--surface-color);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 2rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Dropzone Customization */
     .dropzone {
-        border: 2px dashed #0087F7;
-        margin: 10%;
-        min-height: 400px;
-        color:  #0087F7;
-    }
-    #fike {border: 2px dashed #0087F7;
-        margin: 10%;
-        min-height: 100px;
-        color:  #0087F7;}
-    /* Add margin between form elements */
-    .custom-form {
-        margin-bottom: 15px; /* Adjust as needed */
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--background-color);
+        transition: background-color 0.2s ease-in-out;
     }
 
-    /* Inline forms adjustment */
-    .form-control, #brand, #rating, #model {
-        margin-right: 10px;
-        border: 2px solid black;
-        margin-bottom: 15px;
-
+    .dropzone:hover {
+        background-color: #e9ecef;
+        border-color: var(--primary-color);
     }
 
-    /* Button styling */
-    .custom-form .btn-primary {
-        margin-top: 10px;
+    .dz-message {
+        color: var(--secondary-color);
+        font-weight: 500;
     }
-  </style>
 
+    /* Accordion Styling */
+    .accordion-item {
+        border-color: var(--border-color);
+        border-radius: var(--border-radius) !important; /* Override bootstrap */
+    }
+    .accordion-button {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(0, 123, 255, 0.05);
+        color: var(--primary-color);
+    }
 
-  <main id="main" data-aos="fade" data-aos-delay="100">
+    /* General Form Styling */
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+        border-color: var(--border-color);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    }
 
-    <!-- ======= End Page Header ======= -->
+    /* Flashed Messages */
+    .flash-message {
+        margin-top: 1rem;
+        border-radius: var(--border-radius);
+    }
+    .invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+    height: 10px;
+    }
+    .required:before {
+    content:" *";
+    color: red;
+  }
+
+</style>
+
+<main id="main">
     <div class="page-header d-flex align-items-center">
-      <div class="container position-relative">
-        <div class="row d-flex justify-content-center">
-          <div class="col-lg-6 text-center">
-            <h2>Secret file upload</h2>
-              <p>This is where the magic happens! As an admin please note:</p>
-            <br>
-              <p>1. You can now upload multiple images as you wish!(upto 9)</p>
-              <p>2. Only images are accepted (for now). Each upload will be treated as multiple images of one vehicle post</p>
-              <p>3. Non-media file types won't be accepted. Click/drag to drop-area to add files and wait for tick</p>
-            <br>
-<!--                {{ dropzone.create(action=url_for('upload')) }}-->
-            <br>
-            <br>
-            <form method="POST" action="/upload" enctype="multipart/form-data">
-                  {{ form.hidden_tag() }}
-                {{ wtf.form_field(form.file) }}
-                  <hr class="my-4">
-    <h5>Specifications</h5>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.brand) }}
-            {{ wtf.form_field(form.model) }}
-            {{ wtf.form_field(form.vehicle_type) }}
-            {{ wtf.form_field(form.model_year) }}
-            {{ wtf.form_field(form.engine_rating) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.price) }}
-            {{ wtf.form_field(form.mileage) }}
-            {{ wtf.form_field(form.fuel) }}
-            {{ wtf.form_field(form.transmission) }}
-            {{ wtf.form_field(form.drive_type) }}
-            {{ wtf.form_field(form.availability) }}
-            {{ wtf.form_field(form.condition) }}
-        </div>
-    </div>
-    <hr class="my-4">
-    <h5>Comfort Features</h5>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.form_field(form.seat_material) }}
-        </div>
-        <div class="col-md-4">
-            {{ wtf.form_field(form.trimming) }}
-        </div>
-        <div class="col-md-4">
-            {{ wtf.form_field(form.air_conditioning) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.sound_system) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.power_windows) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.form_field(form.sunroof) }}
-        </div>
-        <div class="col-md-4">
-            {{ wtf.form_field(form.heated_seats) }}
-        </div>
-        <div class="col-md-4">
-            {{ wtf.form_field(form.powered_tailgate) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.phone_connectivity) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.auto_start_stop) }}
-        </div>
-    </div>
-
-    <hr class="my-4">
-    <h5>Safety Features</h5>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.srs_air_bags) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.lane_assistance) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.hill_descent_control) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.roll_stability_control) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.standard_cruise_control) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.adaptive_cruise_control) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.antilock_braking_system) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.emergency_braking_assist) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.form_field(form.immobilizer_and_anti_theft) }}
-        </div>
-        <div class="col-md-6">
-            {{ wtf.form_field(form.electronic_stability_control) }}
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-9">
-            {{ wtf.form_field(form.description) }}
-        </div>
-        <div class="col-md-2">
-            {{ wtf.form_field(form.ai) }}
-        </div>
-    </div>
-    {{ form.submit(class="btn btn-primary") }}
-<!--              {{ wtf.quick_form(form, form_type="inline", button_map={"submit": "primary"}) }}-->
-            </form>
-            <!--            <form action = "{{url_for('upload') }}" method="POST" enctype="multipart/form-data" id="file-form">-->
-<!--              <input class="cta-btn" id="media" type="file" name="file" multiple >-->
-<!--              <input class="cta-btn button-margin" type = "submit" value="Upload">-->
-<!--            </form>-->
-<!--            <br>-->
-<!--            <div id="Progress_Status">-->
-<!--            <div id="myprogressBar"></div>-->
-<!--          </div>-->
-<!--            <a class="cta-btn" href="contact.html">Available for hire</a>-->
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="d-flex align-items-center">
-        <p class="notification is-danger">
-            {{ messages[0] }}.
-        </p>
+        <div class="container position-relative">
+            <div class="row d-flex justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2>Secret File Upload</h2>
+                    <p>Drag and drop images into the box below. Fill out the vehicle details in the collapsible sections and click submit.</p>
+                </div>
             </div>
-        {% endif %}
-        {% endwith %}
-
-          </div>
         </div>
-      </div>
-    </div><!-- End Page Header -->
+    </div>
 
-    <section class="sample-page">
-      <div class="container" data-aos="fade-up">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" id="vehicle-upload-form" class="form-container-card">
+                {{ form.hidden_tag() }}
 
-        <p>
-          upload your files here!
-        </p>
-        {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <p class="notification is-danger" style="color:red">
-            {{ messages[0] }}.
-        </p>
-      {% endif %}
-      {% endwith %}
+                <h5>Upload Images (up to 9)</h5>
+                <p class="text-muted">Drop files here or click to upload. The form will be submitted after you fill the details below.</p>
+                <div class="dropzone" id="my-great-dropzone"></div>
 
-      </div>
-    </section>
+                <div style="display: none;">
+                {{ form.file() }}
+                </div>
+                <hr class="my-4">
 
-  </main><!-- End #main -->
+<div class="accordion" id="formAccordion">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Vehicle Specifications
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.brand) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.model) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.vehicle_type) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.model_year) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.engine_rating) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.price) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.mileage) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.fuel) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.transmission) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.drive_type) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.availability) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.vehicle_specs.condition) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Comfort & Interior Features
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">{{ wtf.form_field(form.comfort_interior.seat_material) }}</div>
+                        <div class="col-md-4 mb-3">{{ wtf.form_field(form.comfort_interior.trimming) }}</div>
+                        <div class="col-md-4 mb-3">{{ wtf.form_field(form.comfort_interior.air_conditioning) }}</div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.comfort_interior.sound_system) }}</div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.power_windows() }}
+                                {{ form.comfort_interior.power_windows.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.sunroof() }}
+                                {{ form.comfort_interior.sunroof.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.heated_seats() }}
+                                {{ form.comfort_interior.heated_seats.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.powered_tailgate() }}
+                                {{ form.comfort_interior.powered_tailgate.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.phone_connectivity() }}
+                                {{ form.comfort_interior.phone_connectivity.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.auto_start_stop() }}
+                                {{ form.comfort_interior.auto_start_stop.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.ventilated_seats() }}
+                                {{ form.comfort_interior.ventilated_seats.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.memory_seats() }}
+                                {{ form.comfort_interior.memory_seats.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.power_adjustable_seats() }}
+                                {{ form.comfort_interior.power_adjustable_seats.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.dual_zone_climate_control() }}
+                                {{ form.comfort_interior.dual_zone_climate_control.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.rear_air_conditioning() }}
+                                {{ form.comfort_interior.rear_air_conditioning.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.steering_wheel_controls() }}
+                                {{ form.comfort_interior.steering_wheel_controls.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.heated_steering_wheel() }}
+                                {{ form.comfort_interior.heated_steering_wheel.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.auto_dimming_mirrors() }}
+                                {{ form.comfort_interior.auto_dimming_mirrors.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.rain_sensing_wipers() }}
+                                {{ form.comfort_interior.rain_sensing_wipers.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.cargo_cover() }}
+                                {{ form.comfort_interior.cargo_cover.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.split_folding_rear_seats() }}
+                                {{ form.comfort_interior.split_folding_rear_seats.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.keyless_entry() }}
+                                {{ form.comfort_interior.keyless_entry.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.push_button_start() }}
+                                {{ form.comfort_interior.push_button_start.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.comfort_interior.remote_start() }}
+                                {{ form.comfort_interior.remote_start.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Safety & Driver Assistance
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.srs_air_bags() }}
+                                {{ form.safety_assistance.srs_air_bags.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.lane_assistance() }}
+                                {{ form.safety_assistance.lane_assistance.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.hill_descent_control() }}
+                                {{ form.safety_assistance.hill_descent_control.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.roll_stability_control() }}
+                                {{ form.safety_assistance.roll_stability_control.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.standard_cruise_control() }}
+                                {{ form.safety_assistance.standard_cruise_control.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.adaptive_cruise_control() }}
+                                {{ form.safety_assistance.adaptive_cruise_control.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.antilock_braking_system() }}
+                                {{ form.safety_assistance.antilock_braking_system.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.emergency_braking_assist() }}
+                                {{ form.safety_assistance.emergency_braking_assist.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.immobilizer_and_anti_theft() }}
+                                {{ form.safety_assistance.immobilizer_and_anti_theft.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.electronic_stability_control() }}
+                                {{ form.safety_assistance.electronic_stability_control.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.rear_view_camera() }}
+                                {{ form.safety_assistance.rear_view_camera.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.parking_sensors_front() }}
+                                {{ form.safety_assistance.parking_sensors_front.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.parking_sensors_rear() }}
+                                {{ form.safety_assistance.parking_sensors_rear.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.camera_360() }}
+                                {{ form.safety_assistance.camera_360.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.blind_spot_monitoring() }}
+                                {{ form.safety_assistance.blind_spot_monitoring.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.rear_cross_traffic_alert() }}
+                                {{ form.safety_assistance.rear_cross_traffic_alert.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.driver_attention_alert() }}
+                                {{ form.safety_assistance.driver_attention_alert.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.traffic_sign_recognition() }}
+                                {{ form.safety_assistance.traffic_sign_recognition.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.automatic_high_beams() }}
+                                {{ form.safety_assistance.automatic_high_beams.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.safety_assistance.tire_pressure_monitoring() }}
+                                {{ form.safety_assistance.tire_pressure_monitoring.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                    Infotainment & Connectivity
+                </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.infotainment.navigation_system() }}
+                                {{ form.infotainment.navigation_system.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.infotainment.bluetooth_connectivity() }}
+                                {{ form.infotainment.bluetooth_connectivity.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.infotainment.usb_ports() }}
+                                {{ form.infotainment.usb_ports.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.infotainment.wireless_charging() }}
+                                {{ form.infotainment.wireless_charging.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.infotainment.wi_fi_hotspot() }}
+                                {{ form.infotainment.wi_fi_hotspot.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSix">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                    Exterior & Styling
+                </button>
+            </h2>
+            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.exterior.led_headlights() }}
+                                {{ form.exterior.led_headlights.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.exterior.alloy_wheels() }}
+                                {{ form.exterior.alloy_wheels.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.exterior.roof_rails() }}
+                                {{ form.exterior.roof_rails.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.exterior.spoiler() }}
+                                {{ form.exterior.spoiler.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">{{ wtf.form_field(form.exterior.paint_color) }}</div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.exterior.exterior_color_metallic() }}
+                                {{ form.exterior.exterior_color_metallic.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSeven">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                    Performance & Driving Dynamics
+                </button>
+            </h2>
+            <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.performance.sport_suspension() }}
+                                {{ form.performance.sport_suspension.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.performance.selectable_drive_modes() }}
+                                {{ form.performance.selectable_drive_modes.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.performance.paddle_shifters() }}
+                                {{ form.performance.paddle_shifters.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDescription"> <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
+                    Description
+                </button>
+            </h2>
+            <div id="collapseDescription" class="accordion-collapse collapse" aria-labelledby="headingDescription" data-bs-parent="#formAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-md-10 mb-3">{{ wtf.form_field(form.description) }}</div>
+                        <div class="col-md-2 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.ai() }}
+                                {{ form.ai.label(class_="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+    <hr class="my-4">
+
+                <div class="d-grid gap-2">
+                    <button type="button" id="submit-all" class="btn btn-primary btn-lg">Submit Vehicle Post</button>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-info flash-message mt-3">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+                {% endwith %}
+
+            </form>
+        </div>
+    </div>
+</div>
+</main>
+
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<!--<script src="/static/assets/js/dropzone.js"></script>-->
+
+<script>
+    // Prevent Dropzone from auto-discovering this element and attaching itself.
+    Dropzone.autoDiscover = false;
+
+    const fileInputName = "{{ form.file.name }}";
+
+    var myDropzone = new Dropzone("#my-great-dropzone", {
+        url: "{{ url_for('upload') }}",
+        // Use the name from the WTForms field!
+        paramName: fileInputName,
+        maxFiles: 9,
+        maxFilesize: 10, // MB
+        uploadMultiple: true,
+        acceptedFiles: 'image/*',
+        addRemoveLinks: true,
+        autoProcessQueue: false, // IMPORTANT!
+        parallelUploads: 9
+    });
+
+    // Find our submit button
+    var submitButton = document.querySelector("#submit-all");
+
+    submitButton.addEventListener("click", function(e) {
+        // Make sure that the form isn't submitted first
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Check if the user has added any files
+        if (myDropzone.getQueuedFiles().length > 0) {
+            // Tell Dropzone to process all queued files.
+            myDropzone.processQueue();
+        } else {
+            // If no files are selected, you can either display an error
+            // or just submit the form without files.
+            // For now, we'll just submit the form.
+             console.error('Upload failed! Missing Data');
+             alert("You must upload image files. Please try again.");
+        }
+    });
+
+    // Listen to the "sendingmultiple" event.
+    // This is fired just before the files are sent.
+    // It allows us to add the other form data to the same request.
+    myDropzone.on("sendingmultiple", function(file, xhr, formData) {
+      // Append all other form data
+      var form = document.querySelector("#vehicle-upload-form");
+      var elements = form.elements;
+      for (var i = 0; i < elements.length; i++) {
+        var el = elements[i];
+        // Make sure we don't add the file input's data again
+        if (el.name && el.name !== fileInputName) {
+      if (el.type === 'checkbox') {
+        // Only append checkbox value if it's checked
+        if (el.checked) {
+          formData.append(el.name, el.value);
+        }
+        // If unchecked, do NOT append it. This mimics browser behavior.
+      } else {
+        // For all other input types, append their value
+        formData.append(el.name, el.value);
+      }
+        }
+      }
+    });
+
+    // SUCCESS: Handle the JSON success response from Flask
+myDropzone.on("successmultiple", function(files, response) {
+  // 'response' is now the JSON object we returned from Flask
+  console.log('Upload successful!', response);
+  alert(response.message); // Show the success message from the server
+
+  // Clear the dropzone and reload the page to get a fresh form
+  myDropzone.removeAllFiles(true);
+  window.location.reload();
+});
+
+// ERROR: Handle the JSON error response from Flask
+myDropzone.on("errormultiple", function(files, response) {
+  // Use the developer console for detailed objects
+  console.error('Dropzone error:', JSON.stringify(response, null, 2));
+
+  let errorMessage = "An unknown error occurred. Please check the developer console.";
+  if (response && typeof response === 'object' && response.errors) {
+
+    // --- NEW: Handle the nested error structure ---
+    // Outer loop for main form sections (e.g., "vehicle_specs")
+    for (const categoryName in response.errors) {
+      const categoryErrors = response.errors[categoryName];
+
+      // Inner loop for the actual fields within that section (e.g., "engine_rating")
+      for (const fieldName in categoryErrors) {
+        const errorMessages = categoryErrors[fieldName];
+
+        const prefixedFieldName = `${categoryName}-${fieldName}`;
+
+        // Now, find the input element using the CORRECT prefixed name
+        const inputElement = document.querySelector(`[name="${prefixedFieldName}"]`);
+        // --- END OF FIX ---
+
+        if (inputElement) {
+          // Add the 'is-invalid' class to turn the border red
+          inputElement.classList.add('is-invalid');
+
+          const parentContainer = inputElement.closest('.mb-3') || inputElement.parentElement;
+
+          if (parentContainer) {
+            // Create a new div for the error message
+            const errorElement = document.createElement('div');
+            errorElement.classList.add('invalid-feedback');
+            errorElement.textContent = errorMessages.join(', ');
+
+            // Append the error message
+            parentContainer.appendChild(errorElement);
+          }
+        }
+      }
+    }
+    // --- END OF NEW LOGIC ---
+}
+    alert("Please fix the highlighted errors and try again.");
 
 
-  {% include 'footer.html' %}
+
+  // Check if the response is the JSON object we expect from Flask
+  // Handle cases where the response might be a simple string
+  if (typeof response === 'string') {
+    // This can happen for errors like "You can't upload files of this type." from Dropzone itself
+    errorMessage = response;
+    alert(errorMessage)
+  }
+
+  // It's good practice to remove the rejected files from the queue
+  files.forEach(file => myDropzone.removeFile(file));
+});
+</script>
+
+{% include 'footer.html' %}

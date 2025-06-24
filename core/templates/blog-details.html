@@ -29,6 +29,32 @@
 
   <!-- Main CSS File -->
   <link href="/static/assets/css/main_v2.css" rel="stylesheet">
+  <style>
+    /* Modern UI Variable-based Theme */
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --background-color: #f8f9fa;
+        --surface-color: #ffffff;
+        --border-color: #dee2e6;
+        --text-color: #212529;
+        --border-radius: 0.5rem;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+     /* Accordion Styling */
+    .accordion-item {
+        border-color: var(--border-color);
+        border-radius: var(--border-radius) !important; /* Override bootstrap */
+    }
+    .accordion-button {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(0, 123, 255, 0.05);
+        color: var(--primary-color);
+    }
+  </style>
 
   <!-- =======================================================
   * Template Name: Active
@@ -310,8 +336,8 @@
                 </div>
                 <p>Make: {{post.brand.capitalize()}}</p>
                 <p>Model: {{post.title.capitalize()}}</p>
-                <p>Engine Size: {{post.engine_rating}} cc</p>
-                <p>Mileage: {{post.mileage}} km</p>
+                <p>Engine Size: {%if post.engine_rating != '' %} {{post.engine_rating}} {%else%} N/A {%endif%}</p>
+                <p>Mileage: {%if post.mileage%}{{post.mileage}} km{%else%} N/A {%endif%}</p>
                 <p>Model Year: {{post.model_year}}</p>
                 <p>Build Type: {{post.vehicle_type}}</p>
                 <p>Fuel Type: {{post.fuel}}</p>
@@ -411,6 +437,81 @@
                 </div>
               </div>
             </div>
+            <div class="accordion-item">
+    <h2 class="accordion-header" id="infotainmentHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#infotainmentCollapse" aria-expanded="false" aria-controls="infotainmentCollapse">
+        Infotainment & Connectivity
+      </button>
+    </h2>
+    <div id="infotainmentCollapse" class="accordion-collapse collapse" aria-labelledby="infotainmentHeading" data-bs-parent="#featuresAccordion">
+      <div class="accordion-body">
+        <ul class="spec-list">
+          {% if features and not features.get('error') and features.get('infotainment') %}
+            {% for key, value in features['infotainment'].items() %}
+              {% if value is true or value %}
+                <li class="spec-item">
+                  <span class="spec-label">{{ key|replace('_', ' ')|capitalize }}:</span>
+                  {% if value is true %} ✔ {% else %} {{ value|capitalize }} {% endif %}
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <li class="spec-item text-muted">No infotainment features listed.</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+            <div class="accordion-item">
+    <h2 class="accordion-header" id="exteriorHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exteriorCollapse" aria-expanded="false" aria-controls="exteriorCollapse">
+        Exterior & Styling
+      </button>
+    </h2>
+    <div id="exteriorCollapse" class="accordion-collapse collapse" aria-labelledby="exteriorHeading" data-bs-parent="#featuresAccordion">
+      <div class="accordion-body">
+        <ul class="spec-list">
+          {% if features and not features.get('error') and features.get('exterior') %}
+            {% for key, value in features['exterior'].items() %}
+              {% if value is true or value %}
+                <li class="spec-item">
+                  <span class="spec-label">{{ key|replace('_', ' ')|capitalize }}:</span>
+                  {% if value is true %} ✔ {% else %} {{ value|capitalize }} {% endif %}
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <li class="spec-item text-muted">No exterior features listed.</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+            <div class="accordion-item">
+    <h2 class="accordion-header" id="performanceHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#performanceCollapse" aria-expanded="false" aria-controls="performanceCollapse">
+        Performance & Driving Dynamics
+      </button>
+    </h2>
+    <div id="performanceCollapse" class="accordion-collapse collapse" aria-labelledby="performanceHeading" data-bs-parent="#featuresAccordion">
+      <div class="accordion-body">
+        <ul class="spec-list">
+          {% if features and not features.get('error') and features.get('performance') %}
+            {% for key, value in features['performance'].items() %}
+              {% if value is true or value %}
+                <li class="spec-item">
+                  <span class="spec-label">{{ key|replace('_', ' ')|capitalize }}:</span>
+                  {% if value is true %} ✔ {% else %} {{ value|capitalize }} {% endif %}
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <li class="spec-item text-muted">No performance features listed.</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
           </div>
 
         </div>
