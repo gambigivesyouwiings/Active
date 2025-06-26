@@ -75,7 +75,7 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="btn-getstarted" href="{{url_for('contact')}}">Enquiry</a>
+      <a class="btn-getstarted" href="{{url_for('contact')}}" style="color:black">Enquiry</a>
     </div>
   </header>
 
@@ -84,7 +84,7 @@
     <!-- Hero Section -->
     <section id="hero" class="hero section dark-background">
 
-      <img src="/static/assets/img/world-dotted-map.png" alt="" class="hero-bg" data-aos="fade-in" loading="lazy">
+      <img fetchpriority="high" src="/static/assets/img/world-dotted-map.png" alt="hero image" class="hero-bg" data-aos="fade-in">
 
       <div class="container">
         <div class="row gy-4 d-flex">
@@ -151,9 +151,9 @@
     <!-- Filters Section -->
     <div class="text-center">
       <div class="filters">
-        <button onclick="filterItems('search')">Search by Parameters</button>
-        <button onclick="filterItems('brand')">Filter by Brand</button>
-        <button onclick="filterItems('vehicle')">Filter by Vehicle Type</button>
+        <button onclick="filterItems('search')" style="color:black">Search by Parameters</button>
+        <button onclick="filterItems('brand')" style="color:black">Filter by Brand</button>
+        <button onclick="filterItems('vehicle')" style="color:black">Filter by Vehicle Type</button>
       </div>
     </div>
        </div>
@@ -576,7 +576,7 @@
         <div class="row gy-5">
     {% for page in pages %}
         <div id="vehicle-{{ page.id }}" class="col-lg-4 col-md-6 mt-5">
-            <a href="{{ url_for('blog_details', post_id=page.id) }}">
+            <a href="{{ url_for('blog_details', post_id=page.id) }}" aria-label="link for vehicle ID number {{page.id}}">
         <div class="card card-standard">
             {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
             <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">

@@ -210,7 +210,7 @@
 
           {% for page in pages %}
         <div id="vehicle-{{ page.id }}" class="col-lg-4 col-md-6 mt-5">
-            <a href="{{ url_for('blog_details', post_id=page.id) }}">
+            <a href="{{ url_for('blog_details', post_id=page.id) }}" aria-label="link to vehicle with ID Number {{page.id}}">
         <div class="card card-standard">
             {% set image_url = page.img_url.strip("[]").split(",")[0].strip().strip("'") %}
             <img src="{{ page.folder_name ~ '/' ~ image_url }}" class="card-img-top" alt="Car Image" loading="lazy">
