@@ -217,7 +217,7 @@ def home():
                            pages=last_six_entries)
 
 
-@app.route("/contact_us", methods=["GET", "POST"])
+@app.route("/contacts", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
         name = request.form["name"]
@@ -247,7 +247,7 @@ def portfolio():
     return render_template("portfolio.html")
 
 
-@app.route("/about_us")
+@app.route("/about")
 def about():
     return render_template("about.html")
 
