@@ -2606,7 +2606,7 @@ color: var(--contrast-color);
 
 .toggle-btn.active {
     background-color: var(--accent-color);
-    color: var(--contrast-color);
+    color: black;
     font-weight: 500;
 }
 
