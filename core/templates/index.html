@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>More actions
 <html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:ig="http://www.w3.org/2001/XMLSchema-instance">
 
 <head>
@@ -19,8 +19,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
 
   <!-- Vendor CSS Files -->
-  <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
-  <link href="/static/assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
+  <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link href="/static/assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="/static/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
   <link href="/static/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
@@ -84,14 +84,14 @@
     <!-- Hero Section -->
     <section id="hero" class="hero section dark-background">
 
-      <img fetchpriority="high" src="/static/assets/img/world-dotted-map.png" alt="hero image" class="hero-bg">
+      <img fetchpriority="high" src="/static/assets/img/world-dotted-map.png" alt="hero image" class="hero-bg" data-aos="fade-in">
 
       <div class="container">
         <div class="row gy-4 d-flex">
           <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
-            <h2>Go Vroom, Vroom... with Mushroom!</h2>
-            <p>Find your Perfect car. Finance your ticket to Comfort & Convenience.</p>
-            <a href="#filter"><p ><em>Explore our vehicles</em></p></a>
+            <h2 data-aos="fade-up">Go Vroom, Vroom... with Mushroom!</h2>
+            <p data-aos="fade-up" data-aos-delay="100">Find your Perfect car. Finance your ticket to Comfort & Convenience.</p>
+            <a href="#filter"><p data-aos="fade-up" data-aos-delay="100"><em>Explore our vehicles</em></p></a>
 
             <form hx-get="/search" hx-swap="outerHTML"  hx-target="#results" class="form-search d-flex align-items-stretch mb-0" data-aos="fade-up" data-aos-delay="100" id="myForm" onsubmit="addEventOnInput()">
                       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -102,7 +102,7 @@
             <div class="p-2 hide bd-highlight" id="results">
             </div>
 
-            <div class="row gy-4">
+            <div class="row gy-4" data-aos="fade-up" data-aos-delay="100">
 
               <div class="col-lg-3 col-6">
                 <div class="stats-item text-center w-100 h-100">
@@ -136,7 +136,7 @@
 
           </div>
 
-          <div class="col-lg-5 order-1 order-lg-2 hero-img">
+          <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
             <img id="mushroom_svg" src="/static/assets/img/mushroom_00001.svg" class="img-fluid mb-3 mb-lg-0" alt="">
           </div>
 
