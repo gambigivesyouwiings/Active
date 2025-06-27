@@ -505,7 +505,7 @@ h6 {
   border: 2px solid transparent;
   transition: 0.3s all ease-in-out;
   font-size: 14px;
-  color: var(--contrast-color) !important;
+  color: black !important;
 }
 
 .footer .btn-learn-more:hover {
