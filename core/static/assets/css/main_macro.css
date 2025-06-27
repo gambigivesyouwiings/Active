@@ -763,6 +763,11 @@ section,
   font-weight: 500;
   margin-bottom: 0;
 }
+.section-title h1,
+#filter h1 {
+  font-size: 30px;
+  font-weight: 500;
+}
 
 .section-title p {
   font-size: 15px;
@@ -843,7 +848,7 @@ section,
 }
 
 .hero form .btn-primary {
-  color: var(--contrast-color);
+  color: black;
   background-color: var(--accent-color);
   flex-shrink: 0;
   padding: 0 25px;
